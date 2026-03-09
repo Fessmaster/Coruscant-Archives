@@ -1,5 +1,7 @@
-import { IsNumber, IsString } from 'class-validator';
-import { BasicEntity } from 'src/basic-entity';
+import { BasicEntity } from 'src/basic.entity';
+import { Films } from 'src/films/films.entity';
+import { Planets } from 'src/planets/planets.entity';
+import { Species } from 'src/species/species.entity';
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 
 @Entity('people')
@@ -7,10 +9,10 @@ export class People extends BasicEntity {
   @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ type: 'int', nullable:true })
+  @Column({ type: 'int', nullable: true })
   height: number;
 
-  @Column({ type: 'int', nullable:true })
+  @Column({ type: 'int', nullable: true })
   mass: number;
 
   @Column({ type: 'varchar' })
@@ -25,21 +27,21 @@ export class People extends BasicEntity {
   @Column({ type: 'varchar' })
   birth_year: string;
 
-  @ManyToOne(Planets, (planets) => planets.residents)
+  @ManyToOne(() => Planets, (planets) => planets.residents)
   homeworld: Planets;
 
-  @ManyToMany(Films, (films) => films.characters)
+  @ManyToMany(() => Films, (films) => films.characters)
   @JoinTable()
   films: Films[];
 
-  @ManyToOne(Species, (species) => species.people)
+  @ManyToOne(() => Species, (species) => species.people)
   species: Species;
 
-  @ManyToMany(Vehicles, (vehicles) => vehicles.pilots)
+  @ManyToMany(() => Vehicles, (vehicles) => vehicles.pilots)
   @JoinTable()
   vehicles: Vehicles[];
 
-  @ManyToMany(Starships, (starships) => starships.pilots)
+  @ManyToMany(() => Starships, (starships) => starships.pilots)
   @JoinTable()
   starships: Starships[];
 }

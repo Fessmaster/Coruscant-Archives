@@ -1,4 +1,5 @@
 import {
+  Column,
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
@@ -9,6 +10,9 @@ import {
 export class BasicEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  external_id: number;
 
   @CreateDateColumn()
   created_date: Date;

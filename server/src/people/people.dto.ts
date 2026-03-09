@@ -1,8 +1,9 @@
 import { Transform } from 'class-transformer';
 import { IsString } from 'class-validator';
+import { BasicDto } from 'src/basic.dto';
 import { validateNumber } from 'src/common/utils/validate.utils';
 
-export class PeopleDto {
+export class PeopleDto extends BasicDto {
   @IsString({ message: 'Field name must be a string' })
   name: string;
 
