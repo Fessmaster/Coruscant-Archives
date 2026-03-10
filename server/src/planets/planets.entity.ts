@@ -36,6 +36,5 @@ export class Planets extends BasicEntity {
   residents: People[];
 
   @ManyToMany(() => Films, (films) => films.planets)
-  @JoinTable()
   films: Films[];
 }

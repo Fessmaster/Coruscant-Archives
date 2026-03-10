@@ -1,6 +1,9 @@
 import { BasicEntity } from 'src/basic.entity';
 import { People } from 'src/people/people.entity';
 import { Planets } from 'src/planets/planets.entity';
+import { Species } from 'src/species/species.entity';
+import { Starships } from 'src/starships/starship.entity';
+import { Vehicles } from 'src/vehicles/vehicles.entity';
 import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 
 @Entity('films')
@@ -26,15 +29,19 @@ export class Films extends BasicEntity {
   @ManyToMany(() => People, (people) => people.films)
   characters: People[];
 
-  @ManyToMany(() => Planets, (planets) => planets.films)  
+  @ManyToMany(() => Planets, (planets) => planets.films)
+  @JoinTable()  
   planets: Planets[];
 
-  @ManyToMany(() => Starships, (starships) => starships.films)  
+  @ManyToMany(() => Starships, (starships) => starships.films)
+  @JoinTable()  
   starships: Starships[]
 
-  @ManyToMany(() => Vehicles, (vehicles) => vehicles.films)  
+  @ManyToMany(() => Vehicles, (vehicles) => vehicles.films)
+  @JoinTable()  
   vehicles: Vehicles;
   
-  @ManyToMany(() => Species, (species) => species.films)  
+  @ManyToMany(() => Species, (species) => species.films)
+  @JoinTable()
   species: Species;
 }

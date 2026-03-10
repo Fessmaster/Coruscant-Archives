@@ -40,6 +40,5 @@ export class Species extends BasicEntity {
   people: People[];
 
   @ManyToMany(() => Films, (films) => films.species)
-  @JoinTable()
   films: Films[];
 }
