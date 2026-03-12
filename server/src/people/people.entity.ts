@@ -32,8 +32,7 @@ export class People extends BasicEntity {
   @ManyToOne(() => Planets, (planets) => planets.residents)
   homeworld: Planets;
 
-  @ManyToMany(() => Films, (films) => films.characters)
-  @JoinTable()
+  @ManyToMany(() => Films, (films) => films.characters)  
   films: Films[];
 
   @ManyToOne(() => Species, (species) => species.people)

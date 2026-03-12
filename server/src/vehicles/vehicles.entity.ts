@@ -14,28 +14,28 @@ export class Vehicles extends BasicEntity {
   @Column('varchar')
   manufacturer: string;
 
-  @Column('int')
+  @Column({type:'int', nullable:true})
   cost_in_credits: number;
 
-  @Column('float')
+  @Column({type:'float', nullable:true})
   length: number;
 
-  @Column('int')
+  @Column({type:'int', nullable:true})
   max_atmosphering_speed: number;
 
   @Column('varchar')
   crew: string;
 
-  @Column('int')
+  @Column({type:'int', nullable:true})
   passengers: number;
 
-  @Column('int')
+  @Column({type:'int', nullable:true})
   cargo_capacity: number;
 
   @Column('varchar')
   consumables: string;
 
-  @Column('varchar')
+  @Column({type:'varchar', nullable:true})
   vehicles_class: string;
 
   @ManyToMany(() => People, (people) => people.vehicles)

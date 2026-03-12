@@ -27,6 +27,7 @@ export class Films extends BasicEntity {
   release_date: string; //TODO Трансформувати дату
 
   @ManyToMany(() => People, (people) => people.films)
+  @JoinTable()
   characters: People[];
 
   @ManyToMany(() => Planets, (planets) => planets.films)

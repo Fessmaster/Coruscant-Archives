@@ -1,4 +1,3 @@
-import { error } from "console";
 
 export function getResponse(url: string) {
   return fetch(url)
@@ -16,12 +15,12 @@ export function parseUrl(url: string) {
   return isNaN(id) ? null : id;
 }
 
-export function getRawData(res: any) {
-  return res.map((person) => {
+export function getRawData(res: Record<string, any>) {
+  return res.map((person) => {    
     const { created, edited, url, ...data } = person;
     const rawData = { ...data };
     const external_id = parseUrl(url);
-    for (const [key, value] of Object.entries(rawData)) {      
+    for (const [key, value] of Object.entries(rawData)) {
       if (Array.isArray(value)) {
         rawData[key] = value.map((link) => {
           return link.match(/https|http/) ? parseUrl(link) : link;
@@ -30,21 +29,26 @@ export function getRawData(res: any) {
       if (typeof value === 'string' && value.match(/https|http/))
         rawData[key] = parseUrl(value);
     }
-    return {...rawData, external_id}  
+    return { ...rawData, external_id };
   });
 }
 
-export function validateNumber (data: any, fields: string[]){
-  return data.map(person => {
-    for (const key of fields){      
-      if (person[key]){      
-        person[key] = isNaN(Number(person[key])) ? null : Number(person[key])        
+export function validateNumber(data: Record<string, any>, fields: string[]) {
+  return data.map((item) => {
+    const newItem = { ...item };
+    for (const key of fields) {
+      const value = newItem[key]
+      if (value != undefined) {
+        const num = Number(value)
+        newItem[key] = (isNaN(num) ? null : num) as any;
       }
     }
-    return person    
-  })
+    return newItem;
+  });
 }
 
-export function getSaveDate (data: any){
-  return
+export function setMapData<K, V>(map: Map<K, V>, fields: string[], data: any) {
+  for (const person of data) {
+    const externalId = parseUrl(person.url) ?? 0;
+  }
 }

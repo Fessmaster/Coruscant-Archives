@@ -26,10 +26,10 @@ export class Planets extends BasicEntity {
   @Column({ type: 'varchar' })
   terrain: string;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'float', nullable: true })
   surface_water: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'bigint', nullable: true })
   population: number;
 
   @OneToMany(() => People, (people) => people.homeworld)
