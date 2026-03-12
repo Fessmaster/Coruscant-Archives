@@ -1,7 +1,9 @@
 import { Repository } from 'typeorm';
-import { parseUrl } from '../utils/parse.url.utils';
-import { getResponse } from './get.response.seeding';
+import { getResponse, parseUrl } from '../utils/seeder.utils';
 import { People } from 'src/people/people.entity';
+import { PeopleDto } from 'src/people/people.dto';
+import { validate } from 'class-validator';
+import { plainToInstance } from 'class-transformer';
 export async function getPeopleData(repository: Repository<People>) {
   let url = 'https://swapi.dev/api/people/';
   const relationMap = new Map();
@@ -35,7 +37,7 @@ export async function getPeopleData(repository: Repository<People>) {
         starships: starships,
       });
 
-      const newPerson = repository.save({
+      const rawData = {
         name: name,
         height: height,
         mass: mass,
@@ -44,9 +46,21 @@ export async function getPeopleData(repository: Repository<People>) {
         eye_color: eye_color,
         birth_year: birth_year,
         gender: gender,
-        external_id: externalId
+        external_id: externalId,
+      };
+      const dtoData = plainToInstance(PeopleDto, rawData)
+
+      validate(dtoData).then((errors) => {
+        if (errors.length > 0) {
+          console.log('Validation failed: ', errors);
+        } else {
+          console.log('Validation successful');
+        }
       });
-    }   
+
+      // repository.create(dtoData);
+      // repository.save(dtoData);
+    }
 
     url = response.next;
   }

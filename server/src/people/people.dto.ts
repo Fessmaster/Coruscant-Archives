@@ -5,7 +5,7 @@ import { validateNumber } from 'src/common/utils/validate.utils';
 
 export class PeopleDto extends BasicDto {
   @IsString({ message: 'Field name must be a string' })
-  name: string;
+  name: string ;
 
   @Transform(({ value }) => validateNumber(value))
   height: number | null;
@@ -24,4 +24,7 @@ export class PeopleDto extends BasicDto {
 
   @IsString({ message: 'Field birth_year must be a string' })
   birth_year: string;
+
+  @IsString({ message: 'Field gender must be a string' })
+  gender: string;
 }

@@ -11,10 +11,10 @@ export class People extends BasicEntity {
   @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'float', nullable: true })
   height: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'float', nullable: true })
   mass: number;
 
   @Column({ type: 'varchar' })
