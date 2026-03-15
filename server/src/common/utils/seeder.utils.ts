@@ -1,4 +1,3 @@
-
 export function getResponse(url: string) {
   return fetch(url)
     .then((response) => response.json())
@@ -47,8 +46,13 @@ export function validateNumber(data: Record<string, any>, fields: string[]) {
   });
 }
 
-export function setMapData<K, V>(map: Map<K, V>, fields: string[], data: any) {
-  for (const person of data) {
-    const externalId = parseUrl(person.url) ?? 0;
+export function createRelationMap(map: Map<number, Record<string, number|number[]>>, fields: string[], data: Record<string, any>) {
+  for (const item of Object.values(data)) {
+    const { external_id } = item
+    const relationFields = {};
+    for (const field of fields){
+      relationFields[field] = item[field]
+    }
+    map.set(external_id, relationFields)
   }
 }

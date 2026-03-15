@@ -36,7 +36,7 @@ export class Species extends BasicEntity {
   @ManyToOne(() => Planets, (planets) => planets.name)
   homeworld: Planets;
 
-  @OneToMany(() => People, (people) => people.species)
+  @ManyToMany(() => People, (people) => people.species)
   people: People[];
 
   @ManyToMany(() => Films, (films) => films.species)

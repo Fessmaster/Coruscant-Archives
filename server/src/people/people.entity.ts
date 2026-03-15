@@ -35,8 +35,9 @@ export class People extends BasicEntity {
   @ManyToMany(() => Films, (films) => films.characters)  
   films: Films[];
 
-  @ManyToOne(() => Species, (species) => species.people)
-  species: Species;
+  @ManyToMany(() => Species, (species) => species.people)
+  @JoinTable()
+  species: Species[];
 
   @ManyToMany(() => Vehicles, (vehicles) => vehicles.pilots)
   @JoinTable()

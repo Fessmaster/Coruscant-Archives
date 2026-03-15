@@ -1,6 +1,7 @@
 import { BasicEntity } from 'src/basic.entity';
 import { Films } from 'src/films/films.entity';
 import { People } from 'src/people/people.entity';
+import { Species } from 'src/species/species.entity';
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 
 @Entity('planets')
@@ -35,6 +36,9 @@ export class Planets extends BasicEntity {
   @OneToMany(() => People, (people) => people.homeworld)
   residents: People[];
 
-  @ManyToMany(() => Films, (films) => films.planets)
+  @OneToMany(() => Films, (films) => films.planets)
   films: Films[];
+
+  @OneToMany(() => Species, (species) => species.homeworld)
+  species: Species[]
 }
