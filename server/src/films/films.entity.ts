@@ -24,7 +24,7 @@ export class Films extends BasicEntity {
   producer: string;
 
   @Column({ type: 'varchar' })
-  release_date: string; //TODO Трансформувати дату
+  release_date: string;
 
   @ManyToMany(() => People, (people) => people.films)
   @JoinTable()
