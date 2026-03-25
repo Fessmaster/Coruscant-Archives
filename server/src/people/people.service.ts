@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { People } from './people.entity';
-import { DeepPartial, In, Repository } from 'typeorm';
+import { DataSource, DeepPartial, In, Repository } from 'typeorm';
 import { PeopleDto } from './dto/people.dto';
-import { extname, join } from 'path';
-import { writeFile } from 'fs/promises';
 import { Planets } from 'src/planets/planets.entity';
 import { Vehicles } from 'src/vehicles/vehicles.entity';
 import { Starships } from 'src/starships/starship.entity';
 import { Films } from 'src/films/films.entity';
 import { Images } from 'src/images/images.entity';
 import { Species } from 'src/species/species.entity';
+import { FileService } from 'src/file/file.service';
+import { join } from 'path';
+import { rm } from 'fs/promises';
 
 @Injectable()
 export class PeopleService {
@@ -29,6 +30,8 @@ export class PeopleService {
     private readonly speciesRepository: Repository<Species>,
     @InjectRepository(Images)
     private readonly imagesRepository: Repository<Images>,
+    private readonly fileService: FileService,
+    private readonly dataSource: DataSource,
   ) {}
 
   findOne(id: string) {
@@ -48,27 +51,20 @@ export class PeopleService {
       speciesIds,
       ...peopleDto
     } = dto;
-    const homeworld = await this.planetsRepository.findOne({
-      select: { id: true },
-      where: { id: homeworldId },
-    });
-    console.log('FILMS - ', filmsIds, typeof filmsIds);
-    const films = await this.filmsRepository.find({
-      select: { id: true },
-      where: { id: In(filmsIds) },
-    });
-    const starships = await this.starshipsRepository.find({
-      select: { id: true },
-      where: { id: In(starshipsIds) },
-    });
-    const vehicles = await this.vehiclesRepository.find({
-      select: { id: true },
-      where: { id: In(vehiclesIds) },
-    });
-    const species = await this.speciesRepository.find({
-      select: { id: true },
-      where: { id: In(speciesIds) },
-    });
+    const homeworld = homeworldId;
+    const films = filmsIds.map((film) =>
+      this.filmsRepository.create({ id: film }),
+    );
+    const starships = starshipsIds.map((starship) =>
+      this.starshipsRepository.create({ id: starship }),
+    );
+    const vehicles = vehiclesIds.map((vehicle) =>
+      this.vehiclesRepository.create({ id: vehicle }),
+    );
+    const species = speciesIds.map((species) =>
+      this.speciesRepository.create({ id: species }),
+    );
+
     const newPerson = this.peopleRepository.create({
       ...peopleDto,
       homeworld,
@@ -78,23 +74,36 @@ export class PeopleService {
       species,
     } as DeepPartial<People>);
 
-    await this.peopleRepository.save(newPerson)
-
-    for (const img of images) {
-      const fileName = `${Date.now() + Math.round(Math.random() * 1e9)}${extname(img.originalname)}`;
-      const filePath = join(process.cwd(), 'upload', fileName);
-      //TODO Додати перевірку існування каталога 'upload'!
-      //TODO Розглянути застосування транзакцій
-      //TODO Видаляти зображення у разі невдалого запису
-
-      try {
-        await writeFile(filePath, img.buffer);
-        const newImg = this.imagesRepository.create({ url: filePath, people: newPerson })
-        await this.imagesRepository.save(newImg);
-      } catch (error) {
-        console.log(`Catch error while added new record: `, error);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    const imgNames: string[] = [];
+    try {
+      await queryRunner.manager.save(newPerson);
+      //TODO Варто замінити проміс на цикл
+      const newImages = await Promise.all(
+        images.map(async (img) => {
+          const fileName = await this.fileService.saveFile(img);
+          imgNames.push(fileName);
+          return queryRunner.manager.create(Images, {
+            url: fileName,
+            people: newPerson,
+          });
+        }),
+      );
+      await queryRunner.manager.save(newImages);
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      console.error('An error occurred while adding new people entity ', error)
+      await queryRunner.rollbackTransaction();
+      const pathToFile = join(process.cwd(), 'upload');
+      for (const img of imgNames) {
+        await rm(join(pathToFile, img));
       }
+    } finally {
+      await queryRunner.release();
     }
+
     return newPerson;
   }
 }

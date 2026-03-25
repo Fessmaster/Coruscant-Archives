@@ -17,6 +17,8 @@ import { Starships } from './starships/starship.entity';
 import { Species } from './species/species.entity';
 import { ImageModule } from './images/images.module';
 import { Images } from './images/images.entity';
+import { FileService } from './file/file.service';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -38,8 +40,9 @@ import { Images } from './images/images.entity';
     VehiclesModule,
     StarshipModule,
     ImageModule,
+    FileModule,
   ], 
   controllers: [AppController],
-  providers: [AppService, SeedService],
+  providers: [AppService, SeedService, FileService],
 })
 export class AppModule {}

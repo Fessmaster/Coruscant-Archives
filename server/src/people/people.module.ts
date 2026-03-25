@@ -9,9 +9,10 @@ import { Starships } from 'src/starships/starship.entity';
 import { Species } from 'src/species/species.entity';
 import { Images } from 'src/images/images.entity';
 import { Films } from 'src/films/films.entity';
+import { FileModule } from 'src/file/file.module';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([People, Planets, Vehicles, Starships, Species, Films, Images])],
+  imports:[TypeOrmModule.forFeature([People, Planets, Vehicles, Starships, Species, Films, Images]), FileModule],
   exports: [TypeOrmModule],
   providers: [PeopleService],
   controllers: [PeopleController]
