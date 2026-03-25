@@ -1,10 +1,11 @@
 import { BasicEntity } from 'src/basic.entity';
 import { Films } from 'src/films/films.entity';
+import { Images } from 'src/images/images.entity';
 import { Planets } from 'src/planets/planets.entity';
 import { Species } from 'src/species/species.entity';
 import { Starships } from 'src/starships/starship.entity';
 import { Vehicles } from 'src/vehicles/vehicles.entity';
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity('people')
 export class People extends BasicEntity {
@@ -29,6 +30,12 @@ export class People extends BasicEntity {
   @Column({ type: 'varchar' })
   birth_year: string;
 
+  @Column({type: 'varchar'})
+  gender: string
+
+  @OneToMany(() => Images, (images) => images.people)
+  images: Images[]
+
   @ManyToOne(() => Planets, (planets) => planets.residents)
   homeworld: Planets;
 
@@ -41,7 +48,7 @@ export class People extends BasicEntity {
 
   @ManyToMany(() => Vehicles, (vehicles) => vehicles.pilots)
   @JoinTable()
-  vehicles: Vehicles[];
+  vehicles: Vehicles[]; 
 
   @ManyToMany(() => Starships, (starships) => starships.pilots)
   @JoinTable()

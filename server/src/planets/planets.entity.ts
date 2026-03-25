@@ -36,7 +36,7 @@ export class Planets extends BasicEntity {
   @OneToMany(() => People, (people) => people.homeworld)
   residents: People[];
 
-  @OneToMany(() => Films, (films) => films.planets)
+  @ManyToMany(() => Films, (films) => films.planets)
   films: Films[];
 
   @OneToMany(() => Species, (species) => species.homeworld)

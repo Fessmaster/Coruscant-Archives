@@ -15,6 +15,8 @@ import { Planets } from './planets/planets.entity';
 import { Vehicles } from './vehicles/vehicles.entity';
 import { Starships } from './starships/starship.entity';
 import { Species } from './species/species.entity';
+import { ImageModule } from './images/images.module';
+import { Images } from './images/images.entity';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -25,7 +27,7 @@ import { Species } from './species/species.entity';
       username: 'postgres',
       password: 'admin',
       database: 'cr_lib',
-      entities: [People, Films, Planets, Vehicles, Starships, Species],
+      entities: [People, Films, Planets, Vehicles, Starships, Species, Images],
       autoLoadEntities: true,
       synchronize: true,
     }),
@@ -35,7 +37,8 @@ import { Species } from './species/species.entity';
     SpeciesModule,
     VehiclesModule,
     StarshipModule,
-  ],
+    ImageModule,
+  ], 
   controllers: [AppController],
   providers: [AppService, SeedService],
 })
