@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { People } from './people.entity';
 import { DataSource, DeepPartial, In, Repository } from 'typeorm';
-import { PeopleDto } from './dto/people.dto';
+import { CreatePeopleDto } from './dto/create-people.dto';
 import { Planets } from 'src/planets/planets.entity';
 import { Vehicles } from 'src/vehicles/vehicles.entity';
 import { Starships } from 'src/starships/starship.entity';
@@ -12,6 +12,7 @@ import { Species } from 'src/species/species.entity';
 import { FileService } from 'src/file/file.service';
 import { join } from 'path';
 import { rm } from 'fs/promises';
+import { UpdatePeopleDto } from './dto/update-people.dto';
 
 @Injectable()
 export class PeopleService {
@@ -34,14 +35,20 @@ export class PeopleService {
     private readonly dataSource: DataSource,
   ) {}
 
-  findOne(id: string) {
-    return this.peopleRepository.findOne({
+  async findById(id: string) {
+    const person = await this.peopleRepository.findOne({
       where: { id: Number(id) },
-      relations: { homeworld: true, vehicles: true, starships: true },
-    });
+      relations: { homeworld: true, vehicles: true, starships: true, images:true },
+    });    
+    const images = person?.images?.map(img => {
+      const imgUrl = join(process.cwd(), 'upload', img.url)
+      img.url = imgUrl
+      return img  
+    })
+    return {...person, images}
   }
 
-  async create(dto: PeopleDto, images: Express.Multer.File[]) {
+  async create(dto: CreatePeopleDto, images: Express.Multer.File[]) {
     const {
       img,
       homeworldId,
@@ -78,23 +85,23 @@ export class PeopleService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     const imgNames: string[] = [];
+    const newImages: Images[] = [];
     try {
-      await queryRunner.manager.save(newPerson);
-      //TODO Варто замінити проміс на цикл
-      const newImages = await Promise.all(
-        images.map(async (img) => {
-          const fileName = await this.fileService.saveFile(img);
-          imgNames.push(fileName);
-          return queryRunner.manager.create(Images, {
-            url: fileName,
-            people: newPerson,
-          });
-        }),
-      );
+      await queryRunner.manager.save(newPerson);      
+      for (const img of images) {
+        const fileName = await this.fileService.saveFile(img);
+        imgNames.push(fileName);
+        const newImage = queryRunner.manager.create(Images, {
+          url: fileName,
+          people: newPerson,
+        });
+        newImages.push(newImage)
+      }
+      
       await queryRunner.manager.save(newImages);
       await queryRunner.commitTransaction();
     } catch (error) {
-      console.error('An error occurred while adding new people entity ', error)
+      console.error('An error occurred while adding new people entity ', error);
       await queryRunner.rollbackTransaction();
       const pathToFile = join(process.cwd(), 'upload');
       for (const img of imgNames) {
@@ -105,5 +112,10 @@ export class PeopleService {
     }
 
     return newPerson;
+  }
+
+  async update(id: string, dto: UpdatePeopleDto, images: Express.Multer.File[]) {
+    const person = this.findById(id)
+    console.log(dto);
   }
 }

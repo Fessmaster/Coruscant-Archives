@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Images } from './images.entity';
 
+@Global()
 @Module({
   imports:[TypeOrmModule.forFeature([Images])],
   exports: [TypeOrmModule],

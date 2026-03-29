@@ -10,7 +10,7 @@ import {
 import { BasicDto } from 'src/basic.dto';
 import { validateNumber } from 'src/common/utils/validate.utils';
 
-export class PeopleDto extends BasicDto {
+export class CreatePeopleDto extends BasicDto {
   @ApiProperty()
   @IsString()
   name: string;

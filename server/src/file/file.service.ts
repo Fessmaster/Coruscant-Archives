@@ -1,15 +1,14 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { existsSync, mkdir } from 'fs';
+import { existsSync, mkdirSync,} from 'fs';
 import { writeFile,  } from 'fs/promises';
 import { extname, join,  } from 'path';
 
 @Injectable()
 export class FileService implements OnModuleInit {
   onModuleInit() {
-    if (!existsSync(join(process.cwd(), 'upload'))){
-      mkdir(join(process.cwd(), 'upload'), { recursive: true }, (err) =>{
-        throw new Error('Error while creating directory')
-      })
+    const uploadPath = join(process.cwd(), 'upload')
+    if (!existsSync(uploadPath)){
+      mkdirSync(uploadPath, { recursive: true })
     }
   }
 
@@ -21,3 +20,4 @@ export class FileService implements OnModuleInit {
     return fileName
   }
 }
+
