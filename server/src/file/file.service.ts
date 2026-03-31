@@ -1,14 +1,16 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { existsSync, mkdirSync,} from 'fs';
+import { existsSync, mkdirSync, rm, rmSync,} from 'fs';
 import { writeFile,  } from 'fs/promises';
 import { extname, join,  } from 'path';
 
 @Injectable()
 export class FileService implements OnModuleInit {
-  onModuleInit() {
-    const uploadPath = join(process.cwd(), 'upload')
-    if (!existsSync(uploadPath)){
-      mkdirSync(uploadPath, { recursive: true })
+  
+  private readonly UPLOAD_PATH = join(process.cwd(), 'upload')
+
+  onModuleInit() {    
+    if (!existsSync(this.UPLOAD_PATH)){
+      mkdirSync(this.UPLOAD_PATH, { recursive: true })
     }
   }
 
@@ -18,6 +20,24 @@ export class FileService implements OnModuleInit {
     writeFile(filePath, img.buffer);
 
     return fileName
+  }
+
+  deleteFile(fileName: string){
+    try {
+      rmSync(join(this.UPLOAD_PATH, fileName))
+    } catch (error) {
+      console.error(`An error occurred while try to delete file ${fileName}`);      
+    }
+  }
+
+  deleteFiles(imgList: string[]){
+    for (const fileName of imgList){
+      try {
+        rmSync(join(this.UPLOAD_PATH, fileName))
+      } catch (error) {
+        console.error(`An error occurred while try to delete file ${fileName}`);
+      }
+    }
   }
 }
 

@@ -1,7 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { People } from './people.entity';
-import { DataSource, DeepPartial, In, Repository } from 'typeorm';
+import {
+  DataSource,
+  DeepPartial,
+  In,
+  PersistedEntityNotFoundError,
+  Repository,
+} from 'typeorm';
 import { CreatePeopleDto } from './dto/create-people.dto';
 import { Planets } from 'src/planets/planets.entity';
 import { Vehicles } from 'src/vehicles/vehicles.entity';
@@ -11,8 +17,8 @@ import { Images } from 'src/images/images.entity';
 import { Species } from 'src/species/species.entity';
 import { FileService } from 'src/file/file.service';
 import { join } from 'path';
-import { rm } from 'fs/promises';
 import { UpdatePeopleDto } from './dto/update-people.dto';
+import { MappingFields } from 'src/common/types/mapping-fields.interface';
 
 @Injectable()
 export class PeopleService {
@@ -35,87 +41,151 @@ export class PeopleService {
     private readonly dataSource: DataSource,
   ) {}
 
+  private readonly logger = new Logger(PeopleService.name);
+
   async findById(id: string) {
     const person = await this.peopleRepository.findOne({
       where: { id: Number(id) },
-      relations: { homeworld: true, vehicles: true, starships: true, images:true },
-    });    
-    const images = person?.images?.map(img => {
-      const imgUrl = join(process.cwd(), 'upload', img.url)
-      img.url = imgUrl
-      return img  
-    })
-    return {...person, images}
+      relations: {
+        homeworld: true,
+        vehicles: true,
+        starships: true,
+        images: true,
+      },
+    });
+    const images = person?.images?.map((img) => {
+      const imgUrl = join(process.cwd(), 'upload', img.url);
+      img.url = imgUrl;
+      return img;
+    });
+    return { ...person, images };
   }
 
-  async create(dto: CreatePeopleDto, images: Express.Multer.File[]) {
+  dataMapping(obj, fieldList: string[]) {
+    const mappedData = {};
+    for (const field of fieldList) {
+      const entityField = field.replace(/Ids$/, '');
+      if (field in obj) {
+        const val = obj[field];
+        if (Array.isArray(val)) {
+          mappedData[entityField] = val.map((id) => ({ id: id }));
+        } else if (val === null) {
+          mappedData[entityField] = [];
+        }
+      }
+    }
+    return mappedData;
+  }
+
+  async create(dto: CreatePeopleDto) {
     const {
-      img,
-      homeworldId,
-      filmsIds,
-      starshipsIds,
-      vehiclesIds,
-      speciesIds,
+      homeworldId, 
       ...peopleDto
     } = dto;
-    const homeworld = homeworldId;
-    const films = filmsIds.map((film) =>
-      this.filmsRepository.create({ id: film }),
+    const fieldList = ['filmsIds', 'starshipsIds', 'vehiclesIds', 'speciesIds'];
+    const relationData = this.dataMapping(dto, fieldList);
+    console.log(
+      '===================================================================',
     );
-    const starships = starshipsIds.map((starship) =>
-      this.starshipsRepository.create({ id: starship }),
-    );
-    const vehicles = vehiclesIds.map((vehicle) =>
-      this.vehiclesRepository.create({ id: vehicle }),
-    );
-    const species = speciesIds.map((species) =>
-      this.speciesRepository.create({ id: species }),
+    console.log(relationData);
+    console.log(
+      '===================================================================',
     );
 
+    const homeworld = homeworldId;                                                                           
     const newPerson = this.peopleRepository.create({
       ...peopleDto,
       homeworld,
-      films,
-      starships,
-      vehicles,
-      species,
+      ...relationData,
     } as DeepPartial<People>);
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    const imgNames: string[] = [];
-    const newImages: Images[] = [];
     try {
-      await queryRunner.manager.save(newPerson);      
-      for (const img of images) {
-        const fileName = await this.fileService.saveFile(img);
-        imgNames.push(fileName);
-        const newImage = queryRunner.manager.create(Images, {
-          url: fileName,
-          people: newPerson,
-        });
-        newImages.push(newImage)
-      }
-      
-      await queryRunner.manager.save(newImages);
-      await queryRunner.commitTransaction();
+      return await this.peopleRepository.save(newPerson);
     } catch (error) {
-      console.error('An error occurred while adding new people entity ', error);
-      await queryRunner.rollbackTransaction();
-      const pathToFile = join(process.cwd(), 'upload');
-      for (const img of imgNames) {
-        await rm(join(pathToFile, img));
-      }
-    } finally {
-      await queryRunner.release();
+      this.logger.error('An error occurred while saved person to DB', error);
     }
-
-    return newPerson;
   }
 
-  async update(id: string, dto: UpdatePeopleDto, images: Express.Multer.File[]) {
-    const person = this.findById(id)
-    console.log(dto);
+  async addImages(id: string, images: Express.Multer.File[]) {
+    const person = await this.findById(id);
+    const listOfImagesNames: string[] = [];
+    const newImages: Images[] = [];
+
+    try {
+      for (const img of images) {
+        const fileName = await this.fileService.saveFile(img);
+        listOfImagesNames.push(fileName);
+        newImages.push(
+          this.imagesRepository.create({
+            people: person,
+            url: fileName,
+          }),
+        );
+      }
+      return await this.imagesRepository.save(newImages);
+    } catch (error) {
+      this.logger.error('An error occurred while saved images ', error);
+      if (listOfImagesNames.length !== 0) {
+        this.fileService.deleteFiles(listOfImagesNames);
+      }
+    }
+  }
+
+  async update(id: string, dto: UpdatePeopleDto) {
+    const fieldList = ['filmsIds', 'starshipsIds', 'vehiclesIds', 'speciesIds'];
+    const validDto = Object.fromEntries(
+      Object.entries(dto).filter(([key, val]) => val !== undefined),
+    );
+    const { filmsIds, starshipsIds, vehiclesIds, speciesIds, ...simpleData} = validDto
+    const relationData = this.dataMapping(validDto, fieldList);
+    const updateData = await this.peopleRepository.preload({
+      id: Number(id),
+      ...simpleData,
+      ...relationData
+    });
+
+    if (updateData) {
+      try {
+        await this.peopleRepository.save(updateData);
+      } catch (error) {
+        this.logger.error('An error occurred while saved updated data ', error);
+      }
+    }
+    return updateData;
+  }
+
+  async deletePerson(id: string) {
+    const person = await this.findById(id);
+    if (!person || !person.id) {
+      throw new NotFoundException(`Person `);
+    }
+    try {
+      return await this.peopleRepository.delete(person.id);
+    } catch (error) {
+      this.logger.error('An error occurred while deleted person ', error);
+    }
+  }
+
+  async deleteImg(id: string, imgId: string) {
+    const person = await this.findById(id);
+    const image = await this.imagesRepository.findOne({
+      where: { id: Number(imgId) },
+      relations: { people: true },
+    });
+
+    if (!person || !image) {
+      throw new NotFoundException();
+    }
+
+    if (person.id !== image.people.id) {
+      throw new NotFoundException('Image not belong this person');
+    }
+    try {
+      const result = this.imagesRepository.delete(image.id);
+      this.fileService.deleteFile(image.url);
+      return result;
+    } catch (error) {
+      this.logger.error('An error occurred while deleting image');
+    }
   }
 }

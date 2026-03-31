@@ -9,6 +9,6 @@ export class Images {
   @Column({type: 'varchar'})
   url: string;
 
-  @ManyToOne(()=> People, (people) => people.images)
+  @ManyToOne(()=> People, (people) => people.images, {onDelete: 'CASCADE'})
   people: People
 }

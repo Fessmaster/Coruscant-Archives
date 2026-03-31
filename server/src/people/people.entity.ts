@@ -5,7 +5,14 @@ import { Planets } from 'src/planets/planets.entity';
 import { Species } from 'src/species/species.entity';
 import { Starships } from 'src/starships/starship.entity';
 import { Vehicles } from 'src/vehicles/vehicles.entity';
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 
 @Entity('people')
 export class People extends BasicEntity {
@@ -13,10 +20,10 @@ export class People extends BasicEntity {
   name: string;
 
   @Column({ type: 'float', nullable: true })
-  height: number;
+  height?: number;
 
   @Column({ type: 'float', nullable: true })
-  mass: number;
+  mass?: number;
 
   @Column({ type: 'varchar' })
   hair_color: string;
@@ -30,16 +37,16 @@ export class People extends BasicEntity {
   @Column({ type: 'varchar' })
   birth_year: string;
 
-  @Column({type: 'varchar'})
-  gender: string
+  @Column({ type: 'varchar' })
+  gender: string;
 
-  @OneToMany(() => Images, (images) => images.people)
-  images: Images[]
+  @OneToMany(() => Images, (images) => images.people, { onDelete: 'CASCADE' })
+  images: Images[];
 
   @ManyToOne(() => Planets, (planets) => planets.residents)
   homeworld: Planets;
 
-  @ManyToMany(() => Films, (films) => films.characters)  
+  @ManyToMany(() => Films, (films) => films.characters, { onDelete: 'CASCADE' })
   films: Films[];
 
   @ManyToMany(() => Species, (species) => species.people)
@@ -48,7 +55,7 @@ export class People extends BasicEntity {
 
   @ManyToMany(() => Vehicles, (vehicles) => vehicles.pilots)
   @JoinTable()
-  vehicles: Vehicles[]; 
+  vehicles: Vehicles[];
 
   @ManyToMany(() => Starships, (starships) => starships.pilots)
   @JoinTable()

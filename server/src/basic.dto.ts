@@ -1,18 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class BasicDto {
-  @ApiProperty({
-    type: 'array',
-    items: {
-      type: 'string',
-      format: 'binary',
-      description: 'Image',
-    }
-  })
-  img: any;
-
-  @ApiProperty()
+  @ApiProperty({ example: 'Some text about this entity', type: String })
   @IsString({ message: 'Field about must be a string' })
+  @MinLength(5)
+  @IsNotEmpty()
   about: string;
 }
