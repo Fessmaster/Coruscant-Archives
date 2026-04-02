@@ -19,6 +19,7 @@ import { ImageModule } from './images/images.module';
 import { Images } from './images/images.entity';
 import { FileService } from './file/file.service';
 import { FileModule } from './file/file.module';
+import { BasicService } from './basic/basic.service';
 
 @Module({
   imports: [TypeOrmModule.forRoot({

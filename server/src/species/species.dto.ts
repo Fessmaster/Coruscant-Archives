@@ -1,6 +1,6 @@
 import { Transform } from "class-transformer";
 import { IsString } from "class-validator";
-import { BasicDto } from "src/basic.dto";
+import { BasicDto } from "src/basic/basic.dto";
 import { validateNumber } from "src/common/utils/validate.utils";
 
 

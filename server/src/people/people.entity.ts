@@ -1,4 +1,4 @@
-import { BasicEntity } from 'src/basic.entity';
+import { BasicEntity } from 'src/basic/basic.entity';
 import { Films } from 'src/films/films.entity';
 import { Images } from 'src/images/images.entity';
 import { Planets } from 'src/planets/planets.entity';

@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
   IsArray,
-  IsIn,
   IsInt,
   IsNotEmpty,
   IsNumber,
@@ -13,7 +12,7 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
-import { BasicDto } from 'src/basic.dto';
+import { BasicDto } from 'src/basic/basic.dto';
 import { validateNumber } from 'src/common/utils/validate.utils';
 
 export class CreatePeopleDto extends BasicDto {

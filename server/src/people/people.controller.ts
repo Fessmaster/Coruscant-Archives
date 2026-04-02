@@ -7,6 +7,7 @@ import {
   ParseFilePipe,
   Patch,
   Post,
+  Query,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,6 +19,7 @@ import {
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -30,6 +32,12 @@ import { ImageFileDto } from '../images/ImageFile.dto';
 export class PeopleController {
   constructor(private readonly peopleService: PeopleService) {}
 
+  @Get()
+  @ApiQuery({name: 'skip'})
+  getPersonList(@Query('skip') skip: number){
+    return this.peopleService.getArrayOfEntities(skip)
+  }
+  
   @Get(':id')
   getPersonById(@Param('id') id: string) {
     return this.peopleService.findById(id);
@@ -82,11 +90,18 @@ export class PeopleController {
     return this.peopleService.update(id, peopleDto);
   }
 
+  // тут має бути аутентифікація
   @Delete(':id')
   deletePerson(@Param('id') id: string) {    
-    return this.peopleService.deletePerson(id)
+    return this.peopleService.deleteById(id)
   }
 
+  @Get('restore/:id')
+  restorePerson(@Param('id') id: string) {    
+  return this.peopleService.restoreById(id)
+  }
+
+  // тут має бути аутентифікація
   @Delete(':id/delete-img/:imgId')
   deleteImg(@Param('id') id: string, @Param('imgId') imgId: string){    
     return this.peopleService.deleteImg(id, imgId)
