@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { PlanetsController } from './planets.controller';
 import { PlanetsService } from './planets.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Planets } from './planets.entity';
+import { PlanetsEntity } from './entity/planets.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Planets])],
+  imports: [TypeOrmModule.forFeature([PlanetsEntity])],
   exports: [TypeOrmModule],
   controllers: [PlanetsController],
   providers: [PlanetsService],

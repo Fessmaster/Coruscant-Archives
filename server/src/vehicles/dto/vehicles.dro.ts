@@ -1,9 +1,9 @@
-import { Transform } from "class-transformer";
-import { IsString } from "class-validator";
-import { BasicDto } from "src/basic/basic.dto";
-import { validateNumber } from "src/common/utils/validate.utils";
+import { Transform } from 'class-transformer';
+import { IsString } from 'class-validator';
+import { BasicDto } from 'src/basic/dto/basic.dto';
+import { validateNumber } from 'src/common/utils/validate.utils';
 
-export class StarshipsDto extends BasicDto{
+export class VehiclesDto extends BasicDto {
   @IsString({ message: 'Field name must be a string' })
   name: string;
 
@@ -23,7 +23,7 @@ export class StarshipsDto extends BasicDto{
   max_atmosphering_speed: number;
 
   @IsString({ message: 'Field crew must be a string' })
-  crew: string;
+  crew: number;
 
   @Transform(({ value }) => validateNumber(value))
   passengers: number;
@@ -34,12 +34,6 @@ export class StarshipsDto extends BasicDto{
   @IsString({ message: 'Field consumables must be a string' })
   consumables: string;
 
-  @Transform(({ value }) => validateNumber(value))
-  hyperdrive_rating: number;
-
-  @Transform(({ value }) => validateNumber(value))
-  MGLT: number;
-
-  @IsString({ message: 'Field starship_class must be a string' })
-  starship_class: string;
+  @IsString({ message: 'Field vehicles must be a string' })
+  vehicles_class: string;
 }

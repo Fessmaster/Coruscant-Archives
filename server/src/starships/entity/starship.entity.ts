@@ -1,10 +1,10 @@
-import { BasicEntity } from 'src/basic/basic.entity';
-import { Films } from 'src/films/films.entity';
-import { People } from 'src/people/people.entity';
+import { ExtendedEntity } from 'src/basic/entity/extended-entity.entity';
+import { FilmsEntity } from 'src/films/entity/films.entity';
+import { PeopleEntity } from 'src/people/entity/people.entity';
 import { Column, Entity, ManyToMany } from 'typeorm';
 
 @Entity('starships')
-export class Starships extends BasicEntity {
+export class StarshipsEntity extends ExtendedEntity {
   @Column({type:'varchar'})
   name: string;
 
@@ -44,10 +44,10 @@ export class Starships extends BasicEntity {
   @Column({type:'varchar'})
   starship_class: string;
 
-  @ManyToMany(() => People, (people)=>people.starships)
-  pilots: People[]
+  @ManyToMany(() => PeopleEntity, (people)=>people.starships)
+  pilots: PeopleEntity[]
 
-  @ManyToMany(() => Films, (films) => films.starships)
-  films: Films[]
+  @ManyToMany(() => FilmsEntity, (films) => films.starships)
+  films: FilmsEntity[]
 
 }

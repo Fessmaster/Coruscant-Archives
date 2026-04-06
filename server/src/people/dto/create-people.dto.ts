@@ -12,7 +12,7 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
-import { BasicDto } from 'src/basic/basic.dto';
+import { BasicDto } from 'src/basic/dto/basic.dto';
 import { validateNumber } from 'src/common/utils/validate.utils';
 
 export class CreatePeopleDto extends BasicDto {

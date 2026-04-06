@@ -1,11 +1,11 @@
-import { BasicEntity } from 'src/basic/basic.entity';
-import { Films } from 'src/films/films.entity';
-import { People } from 'src/people/people.entity';
-import { Planets } from 'src/planets/planets.entity';
+import { ExtendedEntity } from 'src/basic/entity/extended-entity.entity';
+import { FilmsEntity } from 'src/films/entity/films.entity';
+import { PeopleEntity } from 'src/people/entity/people.entity';
+import { PlanetsEntity } from 'src/planets/entity/planets.entity';
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity('species')
-export class Species extends BasicEntity {
+export class SpeciesEntity extends ExtendedEntity {
   @Column({ type: 'varchar' })
   name: string;
 
@@ -33,12 +33,12 @@ export class Species extends BasicEntity {
   @Column({ type: 'varchar' })
   language: string;
 
-  @ManyToOne(() => Planets, (planets) => planets.name)
-  homeworld: Planets;
+  @ManyToOne(() => PlanetsEntity, (planets) => planets.name)
+  homeworld: PlanetsEntity;
 
-  @ManyToMany(() => People, (people) => people.species)
-  people: People[];
+  @ManyToMany(() => PeopleEntity, (people) => people.species)
+  people: PeopleEntity[];
 
-  @ManyToMany(() => Films, (films) => films.species)
-  films: Films[];
+  @ManyToMany(() => FilmsEntity, (films) => films.species)
+  films: FilmsEntity[];
 }

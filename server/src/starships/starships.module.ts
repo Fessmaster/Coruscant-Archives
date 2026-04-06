@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { StarshipController } from './starships.controller';
 import { StarshipService } from './starships.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Starships } from './starship.entity';
+import { StarshipsEntity } from './entity/starship.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Starships])],
+  imports: [TypeOrmModule.forFeature([StarshipsEntity])],
   exports: [TypeOrmModule],
   controllers: [StarshipController],
   providers: [StarshipService],

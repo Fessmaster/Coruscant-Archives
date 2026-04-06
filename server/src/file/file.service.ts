@@ -1,43 +1,31 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { existsSync, mkdirSync, rm, rmSync,} from 'fs';
-import { writeFile,  } from 'fs/promises';
-import { extname, join,  } from 'path';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Disk } from 'flydrive';
+import { extname } from 'path';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
-export class FileService implements OnModuleInit {
-  
-  private readonly UPLOAD_PATH = join(process.cwd(), 'upload')
+export class FileService  {
+  constructor(@Inject('STORAGE_PROVIDER') private readonly storage: Disk) {}
+  private readonly logger = new Logger(FileService.name);
 
-  onModuleInit() {    
-    if (!existsSync(this.UPLOAD_PATH)){
-      mkdirSync(this.UPLOAD_PATH, { recursive: true })
-    }
+
+  async saveFile(img: Express.Multer.File) {
+    const fileName = `${uuidv4()}${extname(img.originalname)}`;
+    await this.storage.put(fileName, img.buffer);
+
+    return fileName;
   }
 
-  saveFile(img: Express.Multer.File) {   
-    const fileName = `${Date.now() + Math.round(Math.random() * 1e9)}${extname(img.originalname)}`;
-    const filePath = join(process.cwd(), 'upload', fileName);
-    writeFile(filePath, img.buffer);
-
-    return fileName
-  }
-
-  deleteFile(fileName: string){
+  async deleteFile(fileName: string) {
     try {
-      rmSync(join(this.UPLOAD_PATH, fileName))
+      await this.storage.delete(fileName);
     } catch (error) {
-      console.error(`An error occurred while try to delete file ${fileName}`);      
+      this.logger.error(`Failed to delete file ${fileName}`, error.stack);
     }
   }
 
-  deleteFiles(imgList: string[]){
-    for (const fileName of imgList){
-      try {
-        rmSync(join(this.UPLOAD_PATH, fileName))
-      } catch (error) {
-        console.error(`An error occurred while try to delete file ${fileName}`);
-      }
-    }
+  async deleteFiles(imgList: string[]) {
+    await Promise.all(imgList.map(img => this.storage.delete(img)))    
   }
+
 }
-

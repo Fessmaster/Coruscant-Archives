@@ -25,7 +25,7 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { validatorConfig } from 'src/common/configs/image.validator';
 import { UpdatePeopleDto } from './dto/update-people.dto';
-import { ImageFileDto } from '../images/ImageFile.dto';
+import { ImageFileDto } from '../images/dto/ImageFile.dto';
 
 @ApiTags('people')
 @Controller('people')

@@ -1,23 +1,23 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { People } from './people.entity';
+import { PeopleEntity } from './entity/people.entity';
 import {
   DeepPartial,
   Repository,
 } from 'typeorm';
 import { CreatePeopleDto } from './dto/create-people.dto';
-import { Images } from 'src/images/images.entity';
+import { ImagesEntity } from 'src/images/entity/images.entity';
 import { FileService } from 'src/file/file.service';
 import { UpdatePeopleDto } from './dto/update-people.dto';
 import { BasicService } from 'src/basic/basic.service';
 
 @Injectable()
-export class PeopleService extends BasicService<People> {
+export class PeopleService extends BasicService<PeopleEntity> {
   constructor(
-    @InjectRepository(People)
-    private readonly peopleRepository: Repository<People>,    
-    @InjectRepository(Images)
-    private readonly imagesRepository: Repository<Images>,
+    @InjectRepository(PeopleEntity)
+    private readonly peopleRepository: Repository<PeopleEntity>,    
+    @InjectRepository(ImagesEntity)
+    private readonly imagesRepository: Repository<ImagesEntity>,
     private readonly fileService: FileService    
   ) {
     super(peopleRepository);
@@ -37,7 +37,7 @@ export class PeopleService extends BasicService<People> {
       ...peopleDto,
       homeworld,
       ...relationData,
-    } as DeepPartial<People>);
+    } as DeepPartial<PeopleEntity>);
 
     try {
       return await this.peopleRepository.save(newPerson);
@@ -49,7 +49,7 @@ export class PeopleService extends BasicService<People> {
   async addImages(id: string, images: Express.Multer.File[]) {
     const person = await this.findById(id);
     const listOfImagesNames: string[] = [];
-    const newImages: Images[] = [];
+    const newImages: ImagesEntity[] = [];
 
     try {
       for (const img of images) {

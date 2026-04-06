@@ -9,30 +9,30 @@ import { VehiclesModule } from './vehicles/vehicles.module';
 import { StarshipModule } from './starships/starships.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SeedService } from './seed/seed.service';
-import { People } from './people/people.entity';
-import { Films } from './films/films.entity';
-import { Planets } from './planets/planets.entity';
-import { Vehicles } from './vehicles/vehicles.entity';
-import { Starships } from './starships/starship.entity';
-import { Species } from './species/species.entity';
+import { PeopleEntity } from './people/entity/people.entity';
+import { FilmsEntity } from './films/entity/films.entity';
+import { PlanetsEntity } from './planets/entity/planets.entity';
+import { VehiclesEntity } from './vehicles/entity/vehicles.entity';
+import { StarshipsEntity } from './starships/entity/starship.entity';
+import { SpeciesEntity } from './species/entity/species.entity';
 import { ImageModule } from './images/images.module';
-import { Images } from './images/images.entity';
+import { ImagesEntity } from './images/entity/images.entity';
 import { FileService } from './file/file.service';
 import { FileModule } from './file/file.module';
-import { BasicService } from './basic/basic.service';
+import { UsersModule } from './users/users.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { getTypeOrmConfig } from './common/configs/typeorm.config';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      poolSize: 10,
-      username: 'postgres',
-      password: 'admin',
-      database: 'cr_lib',
-      entities: [People, Films, Planets, Vehicles, Starships, Species, Images],
-      autoLoadEntities: true,
-      synchronize: true,
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => getTypeOrmConfig(configService)
     }),
     PeopleModule,
     FilmsModule,
@@ -42,7 +42,9 @@ import { BasicService } from './basic/basic.service';
     StarshipModule,
     ImageModule,
     FileModule,
-  ], 
+    UsersModule,
+    StorageModule,
+  ],
   controllers: [AppController],
   providers: [AppService, SeedService, FileService],
 })

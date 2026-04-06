@@ -1,11 +1,11 @@
-import { BasicEntity } from 'src/basic/basic.entity';
-import { Films } from 'src/films/films.entity';
-import { People } from 'src/people/people.entity';
-import { Species } from 'src/species/species.entity';
+import { ExtendedEntity } from 'src/basic/entity/extended-entity.entity';
+import { FilmsEntity } from 'src/films/entity/films.entity';
+import { PeopleEntity } from 'src/people/entity/people.entity';
+import { SpeciesEntity } from 'src/species/entity/species.entity';
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 
 @Entity('planets')
-export class Planets extends BasicEntity {
+export class PlanetsEntity extends ExtendedEntity  {
   @Column({ type: 'varchar' })
   name: string;
 
@@ -33,12 +33,12 @@ export class Planets extends BasicEntity {
   @Column({ type: 'bigint', nullable: true })
   population: number;
 
-  @OneToMany(() => People, (people) => people.homeworld)
-  residents: People[];
+  @OneToMany(() => PeopleEntity, (people) => people.homeworld)
+  residents: PeopleEntity[];
 
-  @ManyToMany(() => Films, (films) => films.planets)
-  films: Films[];
+  @ManyToMany(() => FilmsEntity, (films) => films.planets)
+  films: FilmsEntity[];
 
-  @OneToMany(() => Species, (species) => species.homeworld)
-  species: Species[]
+  @OneToMany(() => SpeciesEntity, (species) => species.homeworld)
+  species: SpeciesEntity[]
 }

@@ -6,30 +6,30 @@ import {
   getResponse,
   validateNumber,
 } from 'src/common/utils/seeder.utils';
-import { Films } from 'src/films/films.entity';
-import { People } from 'src/people/people.entity';
-import { Planets } from 'src/planets/planets.entity';
-import { Species } from 'src/species/species.entity';
-import { Starships } from 'src/starships/starship.entity';
-import { Vehicles } from 'src/vehicles/vehicles.entity';
+import { FilmsEntity } from 'src/films/entity/films.entity';
+import { PeopleEntity } from 'src/people/entity/people.entity';
+import { PlanetsEntity } from 'src/planets/entity/planets.entity';
+import { SpeciesEntity } from 'src/species/entity/species.entity';
+import { StarshipsEntity } from 'src/starships/entity/starship.entity';
+import { VehiclesEntity } from 'src/vehicles/entity/vehicles.entity';
 import { Repository, ObjectLiteral, DeepPartial } from 'typeorm';
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
   private readonly logger = new Logger(SeedService.name);
   constructor(
-    @InjectRepository(People)
-    private readonly peopleRepository: Repository<People>,
-    @InjectRepository(Planets)
-    private readonly planetsRepository: Repository<Planets>,
-    @InjectRepository(Vehicles)
-    private readonly vehiclesRepository: Repository<Vehicles>,
-    @InjectRepository(Starships)
-    private readonly starshipsRepository: Repository<Starships>,
-    @InjectRepository(Films)
-    private readonly filmsRepository: Repository<Films>,
-    @InjectRepository(Species)
-    private readonly speciesRepository: Repository<Species>,
+    @InjectRepository(PeopleEntity)
+    private readonly peopleRepository: Repository<PeopleEntity>,
+    @InjectRepository(PlanetsEntity)
+    private readonly planetsRepository: Repository<PlanetsEntity>,
+    @InjectRepository(VehiclesEntity)
+    private readonly vehiclesRepository: Repository<VehiclesEntity>,
+    @InjectRepository(StarshipsEntity)
+    private readonly starshipsRepository: Repository<StarshipsEntity>,
+    @InjectRepository(FilmsEntity)
+    private readonly filmsRepository: Repository<FilmsEntity>,
+    @InjectRepository(SpeciesEntity)
+    private readonly speciesRepository: Repository<SpeciesEntity>,
   ) {}
   private relationPeopleMap = new Map();
   private relationFilmsMap = new Map();

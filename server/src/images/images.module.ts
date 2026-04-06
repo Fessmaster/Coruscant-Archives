@@ -1,10 +1,10 @@
 import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Images } from './images.entity';
+import { ImagesEntity } from './entity/images.entity';
 
 @Global()
 @Module({
-  imports:[TypeOrmModule.forFeature([Images])],
+  imports:[TypeOrmModule.forFeature([ImagesEntity])],
   exports: [TypeOrmModule],
 })
 export class ImageModule {}
