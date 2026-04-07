@@ -23,6 +23,7 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { getTypeOrmConfig } from './common/configs/typeorm.config';
 import { StorageModule } from './storage/storage.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { StorageModule } from './storage/storage.module';
     FileModule,
     UsersModule,
     StorageModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, SeedService, FileService],

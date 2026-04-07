@@ -4,13 +4,13 @@ import { Column, Entity } from 'typeorm';
 
 @Entity('users')
 export class UsersEntity extends BasicEntity {
-  @Column({ type: 'varchar', length: 30 })
+  @Column({ type: 'varchar', unique:true, length: 30 })
   login: string;
 
   @Column({ type: 'varchar'})
   password: string;
 
-  @Column({type: 'varchar'})
+  @Column({type: 'varchar', unique: true})
   email: string;
 
   @Column({type: 'enum', enum: UserRole})

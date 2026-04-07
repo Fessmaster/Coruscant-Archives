@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { ApiProperty } from '@nestjs/swagger';
@@ -7,8 +7,9 @@ import { ApiProperty } from '@nestjs/swagger';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  @Post('register')
   @ApiProperty()
+  @HttpCode(HttpStatus.CREATED)
   createNewUser(@Body() dto: CreateUserDTO){
     return(this.usersService.createNewUser(dto))  
   }
