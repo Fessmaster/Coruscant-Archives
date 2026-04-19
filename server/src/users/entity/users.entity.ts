@@ -13,7 +13,7 @@ export class UsersEntity extends BasicEntity {
   @Column({type: 'varchar', unique: true})
   email: string;
 
-  @Column({type: 'enum', enum: UserRole})
+  @Column({type: 'enum', enum: UserRole, default: 'user'})
   role: string;
 
   @Column({type: 'varchar', nullable: true, name: 'first_name' })

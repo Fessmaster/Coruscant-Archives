@@ -6,12 +6,12 @@ import { join } from 'path';
 const storageProvider = {
   provide: 'STORAGE_PROVIDER',
   useFactory: () => {   
-    const pathToDirectory = join(process.cwd(), 'upload')
+    const pathToDirectory = join(process.cwd(), 'storage', 'uploads')
     if (!existsSync(pathToDirectory)) {
       mkdirSync(pathToDirectory, { recursive: true });
     }
     return new Disk(
-        new FSDriver({ location: './upload', visibility: 'public' }),
+        new FSDriver({ location: './storage/uploads', visibility: 'public' }),
       );
   }
 }

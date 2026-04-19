@@ -24,9 +24,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { getTypeOrmConfig } from './common/configs/typeorm.config';
 import { StorageModule } from './storage/storage.module';
 import { AuthModule } from './auth/auth.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
-  imports: [
+  imports: [ServeStaticModule.forRoot({
+    rootPath: join(__dirname, '..', 'public')
+  }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),

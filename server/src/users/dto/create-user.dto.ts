@@ -11,13 +11,13 @@ import {
 import { UserRole } from 'src/common/enums/user-role';
 
 export class CreateUserDTO {
-  @ApiProperty()
+  @ApiProperty({ description: 'User login', example: 'JohnDoe'})
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty() 
   @Length(3, 30)
   login: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'User password', example: 'qwerty123'})
   @IsString()
   @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, {
     message:
@@ -25,22 +25,17 @@ export class CreateUserDTO {
   })
   password: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'User email address', example: 'johndoe@gmail.com'})
   @IsEmail()
   email: string;
 
-  @ApiProperty()
-  @IsString()
-  @IsEnum(UserRole)
-  role: string;
-
-  @ApiProperty()
+  @ApiProperty({ description: 'User first name', example: 'John'})
   @IsString()
   @Length(2, 30)
   @IsOptional()
   firstName: string;
 
-  @ApiProperty()
+  @ApiProperty({description: 'User second name', example: 'Doe'})
   @IsString()
   @Length(2, 30)
   @IsOptional()

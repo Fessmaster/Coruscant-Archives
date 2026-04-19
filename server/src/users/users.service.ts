@@ -4,15 +4,12 @@ import { UsersEntity } from './entity/users.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDTO } from './dto/create-user.dto';
 import bcrypt from 'bcrypt';
-import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UsersEntity)
-    private readonly usersRepository: Repository<UsersEntity>,
-    private readonly authService: AuthService
-  ) {}
+    private readonly usersRepository: Repository<UsersEntity>) {}
   
   private readonly logger = new Logger(UsersService.name);
 
@@ -40,9 +37,18 @@ export class UsersService {
     try {
       await this.usersRepository.save(newUser);
       const { password: _, ...cropUserData } = newUser;
-      return this.authService.generateTokens(newUser.id);
+      return cropUserData;
     } catch (error) {
       this.logger.error('An error occurred while create new user', error);
     }
   }
+
+  async getUser(login:string):Promise<UsersEntity| null> {
+    return this.usersRepository.findOne({where:{login:login}})
+  }
+
+  async findUser(id: number): Promise<UsersEntity | null> {
+    return this.usersRepository.findOne({where:{id}})    
+  }
+  
 }

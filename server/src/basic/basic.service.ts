@@ -40,7 +40,7 @@ export abstract class BasicService<T extends IBasicEntity> {
       } as FindOptionsRelations<T>,
     });
     const images = entity?.images?.map((img) => {
-      const imgUrl = join(process.cwd(), 'upload', img.url);
+      const imgUrl = join(process.cwd(),'public', 'storage', img.url);
       img.url = imgUrl;
       return img;
     });

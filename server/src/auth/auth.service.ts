@@ -1,38 +1,42 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './interfaces/jwt.interface';
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { UserRole } from "src/common/enums/user-role";
+import { UsersService } from "src/users/users.service";
+import bcrypt from 'bcrypt'
+import { UsersEntity } from "src/users/entity/users.entity";
+import { use } from "passport";
+import { JwtService } from "@nestjs/jwt";
+import { JwtPayload } from "./interface/jwt-payload.interface";
+
 
 @Injectable()
 export class AuthService {
-  private readonly JWT_SECRET: string;
-  private readonly JWT_ACCESS_TOKEN_TTL: string;
-  private readonly JWT_REFRESH_TOKEN_TTL: string;
- 
+  constructor(    
+    private readonly configService: ConfigService,
+    private readonly userService: UsersService,
+    private readonly jwtService: JwtService
+  ) {}
+  
+  async validateUser(username: string, pass: string): Promise<Partial<UsersEntity>> {
+    const user = await this.userService.getUser(username);
+    if (!user){
+      throw new UnauthorizedException('User or password invalid')
+    }
 
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService) {    
-    this.JWT_SECRET = configService.getOrThrow<string>('JWT_SECRET');
-    this.JWT_ACCESS_TOKEN_TTL = configService.getOrThrow<string>(
-      'JWT_ACCESS_TOKEN_TTL',
-    );
-    this.JWT_REFRESH_TOKEN_TTL = configService.getOrThrow<string>(
-      'JWT_REFRESH_TOKEN_TTL',
-    );
+    const isValid = await bcrypt.compare(pass, user.password);
+
+    if (!isValid){
+      throw new UnauthorizedException('User or password invalid')
+    }
+
+    const {password, ...result} = user
+
+    return result
   }
 
-  generateTokens(id: number) {
-    const payload: JwtPayload = { id };
+  async login(user: UsersEntity){
+    const payload: JwtPayload = { username: user.login, sub: user.id}   
 
-    const accessToken = this.jwtService.sign(payload, {
-      expiresIn: this.JWT_ACCESS_TOKEN_TTL as any,
-    });
-
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: this.JWT_REFRESH_TOKEN_TTL as any,
-    });
-
-    return { accessToken, refreshToken };
+    return this.jwtService.sign(payload)
   }
 }
