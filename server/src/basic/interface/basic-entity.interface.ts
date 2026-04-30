@@ -4,7 +4,8 @@ type imageType = {
 };
 export interface IBasicEntity {
   id: number;
-  name: string;
+  name?: string;
+  title?: string;
   about: string;
   images: imageType[];
   delete_at?: number | null;  

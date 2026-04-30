@@ -13,7 +13,6 @@ import {
   MinLength,
 } from 'class-validator';
 import { BasicDto } from 'src/basic/dto/basic.dto';
-import { validateNumber } from 'src/common/utils/validate.utils';
 
 export class CreatePeopleDto extends BasicDto {
   @ApiProperty({ example: 'Luke SkyWalker', type: String })
@@ -86,7 +85,7 @@ export class CreatePeopleDto extends BasicDto {
   homeworldId: number;
 
   @ApiProperty({ type: [Number], example: [1,2]})
-  @IsArray()
+  @IsArray({ message: 'Field filmsIds must be an array' })
   @IsInt({ each: true })
   @IsPositive({each: true})  
   @Min(1, { each: true })

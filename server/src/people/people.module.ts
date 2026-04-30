@@ -10,11 +10,27 @@ import { SpeciesEntity } from 'src/species/entity/species.entity';
 import { ImagesEntity } from 'src/images/entity/images.entity';
 import { FilmsEntity } from 'src/films/entity/films.entity';
 import { FileModule } from 'src/file/file.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ResponseInterceptor } from 'src/common/interceptors/response-interceptor';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([PeopleEntity, PlanetsEntity, VehiclesEntity, StarshipsEntity, SpeciesEntity, FilmsEntity, ImagesEntity]), FileModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      PeopleEntity,
+      PlanetsEntity,
+      VehiclesEntity,
+      StarshipsEntity,
+      SpeciesEntity,
+      FilmsEntity,
+      ImagesEntity,
+    ]),
+    FileModule,
+  ],
   exports: [TypeOrmModule],
-  providers: [PeopleService],
-  controllers: [PeopleController]
+  providers: [
+    PeopleService,
+    { provide: APP_INTERCEPTOR, useClass: ResponseInterceptor },
+  ],
+  controllers: [PeopleController],
 })
 export class PeopleModule {}

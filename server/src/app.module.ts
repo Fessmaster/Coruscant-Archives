@@ -9,14 +9,7 @@ import { VehiclesModule } from './vehicles/vehicles.module';
 import { StarshipModule } from './starships/starships.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SeedService } from './seed/seed.service';
-import { PeopleEntity } from './people/entity/people.entity';
-import { FilmsEntity } from './films/entity/films.entity';
-import { PlanetsEntity } from './planets/entity/planets.entity';
-import { VehiclesEntity } from './vehicles/entity/vehicles.entity';
-import { StarshipsEntity } from './starships/entity/starship.entity';
-import { SpeciesEntity } from './species/entity/species.entity';
 import { ImageModule } from './images/images.module';
-import { ImagesEntity } from './images/entity/images.entity';
 import { FileService } from './file/file.service';
 import { FileModule } from './file/file.module';
 import { UsersModule } from './users/users.module';
@@ -26,6 +19,8 @@ import { StorageModule } from './storage/storage.module';
 import { AuthModule } from './auth/auth.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { APP_FILTER } from '@nestjs/core';
+import { GlobalExceptionFilter } from './common/filters/exception-filter';
 
 @Module({
   imports: [ServeStaticModule.forRoot({
@@ -52,6 +47,9 @@ import { join } from 'path';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService, SeedService, FileService],
+  providers: [AppService, SeedService, FileService, {
+    provide: APP_FILTER,
+    useClass: GlobalExceptionFilter
+  }],
 })
 export class AppModule {}

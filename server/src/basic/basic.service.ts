@@ -1,11 +1,7 @@
 import { Logger, NotFoundException } from '@nestjs/common';
 import { join } from 'path';
-import { IBasicEntity } from 'src/common/types/basic-entity.interface';
-import {
-  FindOptionsRelations,
-  FindOptionsWhere,
-  Repository,
-} from 'typeorm';
+import { IBasicEntity } from 'src/basic/interface/basic-entity.interface';
+import { FindOptionsWhere, Repository } from 'typeorm';
 
 export abstract class BasicService<T extends IBasicEntity> {
   protected readonly logger = new Logger(this.constructor.name);
@@ -29,21 +25,20 @@ export abstract class BasicService<T extends IBasicEntity> {
     return mappedData;
   }
 
-  async findById(id: string) {
+  async findById(id: string, relations: string[]) {
     const entity = await this.basicRepository.findOne({
       where: { id: Number(id) } as unknown as FindOptionsWhere<T>,
-      relations: {
-        homeworld: true,
-        vehicles: true,
-        starships: true,
-        images: true,
-      } as FindOptionsRelations<T>,
+      relations: relations,
     });
+
+    if (!entity) {
+      throw new NotFoundException(`Record width id: ${id} not exist`)
+    }
     const images = entity?.images?.map((img) => {
-      const imgUrl = join(process.cwd(),'public', 'storage', img.url);
+      const imgUrl = join(process.cwd(), 'public', 'storage', img.url);
       img.url = imgUrl;
       return img;
-    });
+    });    
     return { ...entity, images };
   }
 
@@ -63,22 +58,24 @@ export abstract class BasicService<T extends IBasicEntity> {
     }
   }
 
-  async getArrayOfEntities(skip: number){
+  async getArrayOfEntities(skip: number) {
     const navigation = {
       nextPage: false,
-      previousPage: false
-    }
-    const arrayOfEntities = await this.basicRepository.find({take:this.LIMIT+1, skip: skip})
+      previousPage: false,
+    };
+    const arrayOfEntities = await this.basicRepository.find({
+      take: this.LIMIT + 1,
+      skip: skip,
+    });
 
-    if(arrayOfEntities.length > this.LIMIT){
-      navigation.nextPage = true
-      arrayOfEntities.pop
+    if (arrayOfEntities.length > this.LIMIT) {
+      navigation.nextPage = true;
+      arrayOfEntities.pop;
     }
-    if(skip && skip>0){
+    if (skip && skip > 0) {
       navigation.previousPage = true;
     }
 
-    return {navigation, result: arrayOfEntities}
-    
+    return { navigation, result: arrayOfEntities };
   }
 }

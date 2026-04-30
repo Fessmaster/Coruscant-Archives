@@ -24,14 +24,14 @@ export class PeopleService extends BasicService<PeopleEntity> {
   }
 
   protected readonly logger = new Logger(PeopleService.name);
+  private readonly fieldList = ['filmsIds', 'starshipsIds', 'vehiclesIds', 'speciesIds'];
 
   async create(dto: CreatePeopleDto) {
     const {
       homeworldId, 
       ...peopleDto
-    } = dto;
-    const fieldList = ['filmsIds', 'starshipsIds', 'vehiclesIds', 'speciesIds'];
-    const relationData = this.dataMapping(dto, fieldList);
+    } = dto;    
+    const relationData = this.dataMapping(dto, this.fieldList);
     const homeworld = homeworldId;                                                                           
     const newPerson = this.peopleRepository.create({
       ...peopleDto,
@@ -44,10 +44,13 @@ export class PeopleService extends BasicService<PeopleEntity> {
     } catch (error) {
       this.logger.error('An error occurred while saved person to DB', error);
     }
-  }
+  } 
 
   async addImages(id: string, images: Express.Multer.File[]) {
-    const person = await this.findById(id);
+    const person = await this.findById(id, ['homeworld', 'vehicles', 'starships', 'images'])
+    if (!person){
+      throw new NotFoundException('Person not found')
+    }
     const listOfImagesNames: string[] = [];
     const newImages: ImagesEntity[] = [];
 
@@ -56,13 +59,15 @@ export class PeopleService extends BasicService<PeopleEntity> {
         const fileName = await this.fileService.saveFile(img);
         listOfImagesNames.push(fileName);
         newImages.push(
-          this.imagesRepository.create({
-            people: person,
+          this.imagesRepository.create({            
             url: fileName,
           }),
         );
       }
-      return await this.imagesRepository.save(newImages);
+      await this.imagesRepository.save(newImages);
+      person.images = [... person.images, ...newImages]
+      await this.peopleRepository.save(person)      
+      return newImages
     } catch (error) {
       this.logger.error('An error occurred while saved images ', error);
       if (listOfImagesNames.length !== 0) {
@@ -72,12 +77,11 @@ export class PeopleService extends BasicService<PeopleEntity> {
   }
 
   async update(id: string, dto: UpdatePeopleDto) {
-    const fieldList = ['filmsIds', 'starshipsIds', 'vehiclesIds', 'speciesIds'];
     const validDto = Object.fromEntries(
       Object.entries(dto).filter(([key, val]) => val !== undefined),
     );
     const { filmsIds, starshipsIds, vehiclesIds, speciesIds, ...simpleData} = validDto
-    const relationData = this.dataMapping(validDto, fieldList);
+    const relationData = this.dataMapping(validDto, this.fieldList);
     const updateData = await this.peopleRepository.preload({
       id: Number(id),
       ...simpleData,
@@ -94,8 +98,15 @@ export class PeopleService extends BasicService<PeopleEntity> {
     return updateData;
   }
 
+  // {        
+  //       homeworld: true,
+  //       vehicles: true,
+  //       starships: true,
+  //       images: true,
+  //     }
+
   async deleteImg(id: string, imgId: string) {
-    const person = await this.findById(id);
+    const person = await this.findById(id, ['homeworld', 'vehicles', 'starships', 'images']);
     const image = await this.imagesRepository.findOne({
       where: { id: Number(imgId) },
       relations: { people: true },

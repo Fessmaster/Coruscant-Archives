@@ -1,10 +1,8 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { UserRole } from "src/common/enums/user-role";
 import { UsersService } from "src/users/users.service";
 import bcrypt from 'bcrypt'
 import { UsersEntity } from "src/users/entity/users.entity";
-import { use } from "passport";
 import { JwtService } from "@nestjs/jwt";
 import { JwtPayload } from "./interface/jwt-payload.interface";
 

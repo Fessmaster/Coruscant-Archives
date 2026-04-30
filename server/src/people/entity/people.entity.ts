@@ -40,7 +40,8 @@ export class PeopleEntity extends ExtendedEntity {
   @Column({ type: 'varchar' })
   gender: string;
 
-  @OneToMany(() => ImagesEntity, (images) => images.people, { onDelete: 'CASCADE' })
+  @ManyToMany(() => ImagesEntity, (images) => images.people, { onDelete: 'CASCADE' })
+  @JoinTable()
   images: ImagesEntity[];
 
   @ManyToOne(() => PlanetsEntity, (planets) => planets.residents)

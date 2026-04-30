@@ -6,7 +6,7 @@ export class AuthorizationDto {
   @IsString()
   @IsNotEmpty()
   @Length(3, 30)
-  login: string;
+  username: string;
 
   @ApiProperty({ description: 'User password', example: 'qwerty123'})
   @IsString()

@@ -7,26 +7,27 @@ import { mkdir, symlink } from 'fs/promises';
 @Injectable()
 export class FileService implements OnModuleInit {
   constructor(@Inject('STORAGE_PROVIDER') private readonly storage: Disk) {}
+  private readonly logger = new Logger(FileService.name);
   async onModuleInit() {
     const target = join(process.cwd(), 'storage', 'uploads');
     const link = join(process.cwd(), 'public', 'storage');
-
+    // create target path if not exist
     await mkdir(target, { recursive: true });
 
+    // create root directory for symlink if not exist
     await mkdir(dirname(link), { recursive: true });
 
     try {
-      await symlink(target, link, 'dir')
-      console.log('-- Symlink created');      
+      await symlink(target, link, 'dir');
+      this.logger.log('↪ Symlink created');      
     } catch (error) {
-      if (error.code ==='EEXIST'){ 
-        console.log('-- Symlink already exists');
+      if (error.code === 'EEXIST') {
+        this.logger.log('↪ Symlink already exists');        
       } else {
-        console.log('-- Symlink error', error);
+        this.logger.error('↪ Symlink error', error.message);        
       }
     }
   }
-  private readonly logger = new Logger(FileService.name);
 
   async saveFile(img: Express.Multer.File) {
     const fileName = `${uuidv4()}${extname(img.originalname)}`;
