@@ -1,17 +1,21 @@
 import { Logger, NotFoundException } from '@nestjs/common';
 import { join } from 'path';
 import { IBasicEntity } from 'src/basic/interface/basic-entity.interface';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
+import { IMetadata } from './interface/metadata.interface';
 
 export abstract class BasicService<T extends IBasicEntity> {
   protected readonly logger = new Logger(this.constructor.name);
-  constructor(protected readonly basicRepository: Repository<T>) {}
+  constructor(
+    protected readonly basicRepository: Repository<T>,
+    protected readonly metadata: IMetadata<T>
+  ) {}
 
   private readonly LIMIT = 20;
 
-  dataMapping(obj, fieldList: string[]) {
+  dataMapping(obj) {
     const mappedData = {};
-    for (const field of fieldList) {
+    for (const field of this.metadata.fieldList) {
       const entityField = field.replace(/Ids$/, '');
       if (field in obj) {
         const val = obj[field];
@@ -25,10 +29,10 @@ export abstract class BasicService<T extends IBasicEntity> {
     return mappedData;
   }
 
-  async findById(id: string, relations: string[]) {
+  async findById(id: string, ) {
     const entity = await this.basicRepository.findOne({
       where: { id: Number(id) } as unknown as FindOptionsWhere<T>,
-      relations: relations,
+      relations: this.metadata.relations as any,
     });
 
     if (!entity) {

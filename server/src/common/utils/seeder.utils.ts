@@ -15,8 +15,8 @@ export function parseUrl(url: string) {
 }
 
 export function getRawData(res: Record<string, any>) {
-  return res.map((person) => {    
-    const { created, edited, url, ...data } = person;
+  return res.map((record) => {    
+    const { created, edited, url, ...data } = record;
     const rawData = { ...data };
     const external_id = parseUrl(url);
     for (const [key, value] of Object.entries(rawData)) {

@@ -26,7 +26,6 @@ import {
   ApiParam,
   ApiQuery,
   ApiTags,
-  
 } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { validatorConfig } from 'src/common/configs/image.validator';
@@ -65,11 +64,14 @@ export class PeopleController {
   @ApiBadRequestResponse({ description: 'Validation failed' })
   @Get(':id')
   getPersonById(@Param('id') id: string) {
-    return this.peopleService.findById(id, ['homeworld', 'vehicles', 'starships', 'images']);
+    return this.peopleService.findById(id);
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Create new record for this entity',
+  })
   @Post()
   @ApiCreatedResponse({
     description: 'The record has been successfully added to the database',

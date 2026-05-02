@@ -1,7 +1,8 @@
 import { ExtendedEntity } from 'src/basic/entity/extended-entity.entity';
 import { FilmsEntity } from 'src/films/entity/films.entity';
+import { ImagesEntity } from 'src/images/entity/images.entity';
 import { PeopleEntity } from 'src/people/entity/people.entity';
-import { Column, Entity, ManyToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 
 @Entity('vehicles')
 export class VehiclesEntity extends ExtendedEntity {
@@ -14,33 +15,39 @@ export class VehiclesEntity extends ExtendedEntity {
   @Column('varchar')
   manufacturer: string;
 
-  @Column({type:'int', nullable:true})
+  @Column({ type: 'int', nullable: true })
   cost_in_credits: number;
 
-  @Column({type:'float', nullable:true})
+  @Column({ type: 'float', nullable: true })
   length: number;
 
-  @Column({type:'int', nullable:true})
+  @Column({ type: 'int', nullable: true })
   max_atmosphering_speed: number;
 
   @Column('varchar')
   crew: string;
 
-  @Column({type:'int', nullable:true})
+  @Column({ type: 'int', nullable: true })
   passengers: number;
 
-  @Column({type:'int', nullable:true})
+  @Column({ type: 'int', nullable: true })
   cargo_capacity: number;
 
   @Column('varchar')
   consumables: string;
 
-  @Column({type:'varchar', nullable:true})
+  @Column({ type: 'varchar', nullable: true })
   vehicles_class: string;
 
+  @ManyToMany(() => ImagesEntity, (images) => images.vehicles, {
+    onDelete: 'CASCADE',
+  })
+  @JoinTable()
+  images: ImagesEntity[];
+
   @ManyToMany(() => PeopleEntity, (people) => people.vehicles)
-  pilots: PeopleEntity[]
+  pilots: PeopleEntity[];
 
   @ManyToMany(() => FilmsEntity, (films) => films.vehicles)
-  films: FilmsEntity[]
+  films: FilmsEntity[];
 }

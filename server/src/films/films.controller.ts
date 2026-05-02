@@ -1,5 +1,30 @@
-import { Body, Controller, Delete, Get, Param, ParseFilePipe, Patch, Post, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseFilePipe,
+  Patch,
+  Post,
+  Query,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FilmsService } from './films.service';
 import { CreateFilmsDto } from './dto/create-films.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guards';
@@ -11,8 +36,8 @@ import { UpdateFilmsDto } from './dto/update-films.dto';
 @ApiTags('films')
 @Controller('films')
 export class FilmsController {
-  constructor(private readonly filmsService: FilmsService){}
-@ApiOperation({
+  constructor(private readonly filmsService: FilmsService) {}
+  @ApiOperation({
     summary: 'Return array of films',
     description:
       'Return array of films and skips the specified number of entries',
@@ -21,7 +46,7 @@ export class FilmsController {
   @ApiBadRequestResponse({ description: 'Validation failed' })
   @Get()
   @ApiQuery({ name: 'skip' })
-  getPersonList(@Query('skip') skip: number) {
+  getFilmsList(@Query('skip') skip: number) {
     return this.filmsService.getArrayOfEntities(skip);
   }
 
@@ -38,18 +63,21 @@ export class FilmsController {
   @ApiBadRequestResponse({ description: 'Validation failed' })
   @Get(':id')
   getFilmById(@Param('id') id: string) {
-    return this.filmsService.findById(id, ['images','planets']);
+    return this.filmsService.findById(id);
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Create new record for this entity',    
+  })
   @Post()
   @ApiCreatedResponse({
     description: 'The record has been successfully added to the database',
   })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiBody({
-    description: 'Add new person to DB',
+    description: 'Add new film to DB',
     type: CreateFilmsDto,
   })
   createFilm(@Body() filmDto: CreateFilmsDto) {
@@ -72,7 +100,7 @@ export class FilmsController {
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @UseInterceptors(FilesInterceptor('img'))
   @ApiConsumes('multipart/form-data')
-  addImagesToPersonById(
+  addImagesToFilmById(
     @Param('id') id: string,
     @UploadedFiles(new ParseFilePipe(validatorConfig))
     img: Express.Multer.File[],
@@ -84,14 +112,14 @@ export class FilmsController {
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @ApiOperation({
-    summary: 'Updating films record',
-    description: 'Updating person record by id',
+    summary: 'Updating film record',
+    description: 'Updating film record by id',
   })
   @ApiCreatedResponse({
     description: 'The record has been successfully update to the database',
   })
   @ApiForbiddenResponse({ description: 'Forbidden' })
-  updatePerson(@Body() peopleDto: UpdateFilmsDto, @Param('id') id: string) {
+  updateFilm(@Body() peopleDto: UpdateFilmsDto, @Param('id') id: string) {
     return this.filmsService.update(id, peopleDto);
   }
 
@@ -106,7 +134,7 @@ export class FilmsController {
     description: 'The record has been deleting.',
   })
   @ApiForbiddenResponse({ description: 'Forbidden' })
-  deletePerson(@Param('id') id: string) {
+  deleteFilm(@Param('id') id: string) {
     return this.filmsService.deleteById(id);
   }
 
@@ -121,7 +149,7 @@ export class FilmsController {
     description: 'The record has been restored.',
   })
   @ApiForbiddenResponse({ description: 'Forbidden' })
-  restorePerson(@Param('id') id: string) {
+  restoreFilm(@Param('id') id: string) {
     return this.filmsService.restoreById(id);
   }
 

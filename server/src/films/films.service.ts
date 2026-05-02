@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { BasicService } from 'src/basic/basic.service';
 import { FilmsEntity } from './entity/films.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,7 @@ import { ImagesEntity } from 'src/images/entity/images.entity';
 import { FileService } from 'src/file/file.service';
 import { CreateFilmsDto } from './dto/create-films.dto';
 import { UpdateFilmsDto } from './dto/update-films.dto';
+import { FILM_METADATA } from './common/film.metadata';
 
 @Injectable()
 export class FilmsService extends BasicService<FilmsEntity> {
@@ -16,29 +17,29 @@ export class FilmsService extends BasicService<FilmsEntity> {
     @InjectRepository(ImagesEntity)
     private readonly imagesRepository: Repository<ImagesEntity>,
     private readonly fileService: FileService
-  ){ super(filmsRepository)}
+  ){ super(filmsRepository, FILM_METADATA)}
 
     protected readonly logger = new Logger(FilmsService.name);
-    private readonly fieldList = ['charactersIds', 'planetsIds', 'vehiclesIds', 'speciesIds'];
   
     async create(dto: CreateFilmsDto) {      
-      const relationData = this.dataMapping(dto, this.fieldList);                                                                  
-      const newPerson = this.filmsRepository.create({
+      const relationData = this.dataMapping(dto);                                                                  
+      const record = this.filmsRepository.create({
         ...dto,        
         ...relationData,
       } as DeepPartial<FilmsEntity>);
   
       try {
-        return await this.filmsRepository.save(newPerson);
+        return await this.filmsRepository.save(record);
       } catch (error) {
-        this.logger.error('An error occurred while saved person to DB', error);
+        this.logger.error('An error occurred while saved record to DB', error);
+        throw new InternalServerErrorException('An error occurred while saved record to DB')
       }
     }
   
   async addImages(id: string, images: Express.Multer.File[]) {
-      const film = await this.findById(id, ['images'])
+      const film = await this.findById(id)
       if (!film){
-        throw new NotFoundException('Person not found')
+        throw new NotFoundException('Film not found')
       }
       const listOfImagesNames: string[] = [];
       const newImages: ImagesEntity[] = [];
@@ -62,15 +63,17 @@ export class FilmsService extends BasicService<FilmsEntity> {
         if (listOfImagesNames.length !== 0) {
           this.fileService.deleteFiles(listOfImagesNames);
         }
+        throw new InternalServerErrorException('An error occurred while saved images')
       }
     }
   
     async update(id: string, dto: UpdateFilmsDto) {
+      const record = await this.findById(id);
       const validDto = Object.fromEntries(
         Object.entries(dto).filter(([key, val]) => val !== undefined),
       );
-      const { charactersIds, planetsIds, vehiclesIds, speciesIds, ...simpleData} = validDto
-      const relationData = this.dataMapping(validDto, this.fieldList);
+      const { charactersIds, planetsIds, vehiclesIds, starshipsIds, speciesIds, ...simpleData} = validDto
+      const relationData = this.dataMapping(validDto);
       const updateData = await this.filmsRepository.preload({
         id: Number(id),
         ...simpleData,
@@ -82,13 +85,14 @@ export class FilmsService extends BasicService<FilmsEntity> {
           await this.filmsRepository.save(updateData);
         } catch (error) {
           this.logger.error('An error occurred while saved updated data ', error);
+          throw new InternalServerErrorException('An error occurred while saved updated data ')
         }
       }
       return updateData;
     }
   
     async deleteImg(id: string, imgId: string) {
-      const film = await this.findById(id, ['images']);
+      const film = await this.findById(id);
       const image = await this.imagesRepository.findOne({
         where: { id: Number(imgId) },
         relations: { people: true },
@@ -99,7 +103,7 @@ export class FilmsService extends BasicService<FilmsEntity> {
       }
   
       if (film.id !== image.films.id) {
-        throw new NotFoundException('Image not belong this person');
+        throw new NotFoundException('Image not belong this film');
       }
       try {
         const result = this.imagesRepository.delete(image.id);
@@ -107,6 +111,7 @@ export class FilmsService extends BasicService<FilmsEntity> {
         return result;
       } catch (error) {
         this.logger.error('An error occurred while deleting image');
+        throw new InternalServerErrorException('An error occurred while deleting image')
       }
     }
 }

@@ -1,11 +1,12 @@
 import { ExtendedEntity } from 'src/basic/entity/extended-entity.entity';
 import { FilmsEntity } from 'src/films/entity/films.entity';
+import { ImagesEntity } from 'src/images/entity/images.entity';
 import { PeopleEntity } from 'src/people/entity/people.entity';
 import { SpeciesEntity } from 'src/species/entity/species.entity';
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 
 @Entity('planets')
-export class PlanetsEntity extends ExtendedEntity  {
+export class PlanetsEntity extends ExtendedEntity {
   @Column({ type: 'varchar' })
   name: string;
 
@@ -33,6 +34,12 @@ export class PlanetsEntity extends ExtendedEntity  {
   @Column({ type: 'bigint', nullable: true })
   population: number;
 
+  @ManyToMany(() => ImagesEntity, (images) => images.planets, {
+    onDelete: 'CASCADE',
+  })
+  @JoinTable()
+  images: ImagesEntity[];
+
   @OneToMany(() => PeopleEntity, (people) => people.homeworld)
   residents: PeopleEntity[];
 
@@ -40,5 +47,5 @@ export class PlanetsEntity extends ExtendedEntity  {
   films: FilmsEntity[];
 
   @OneToMany(() => SpeciesEntity, (species) => species.homeworld)
-  species: SpeciesEntity[]
+  species: SpeciesEntity[];
 }

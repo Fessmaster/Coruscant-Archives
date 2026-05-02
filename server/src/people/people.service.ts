@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PeopleEntity } from './entity/people.entity';
 import {
@@ -10,6 +10,7 @@ import { ImagesEntity } from 'src/images/entity/images.entity';
 import { FileService } from 'src/file/file.service';
 import { UpdatePeopleDto } from './dto/update-people.dto';
 import { BasicService } from 'src/basic/basic.service';
+import { PEOPLE_METADATA } from './common/people.metadata';
 
 @Injectable()
 export class PeopleService extends BasicService<PeopleEntity> {
@@ -20,34 +21,34 @@ export class PeopleService extends BasicService<PeopleEntity> {
     private readonly imagesRepository: Repository<ImagesEntity>,
     private readonly fileService: FileService    
   ) {
-    super(peopleRepository);
+    super(peopleRepository, PEOPLE_METADATA);
   }
 
   protected readonly logger = new Logger(PeopleService.name);
-  private readonly fieldList = ['filmsIds', 'starshipsIds', 'vehiclesIds', 'speciesIds'];
 
   async create(dto: CreatePeopleDto) {
     const {
       homeworldId, 
       ...peopleDto
     } = dto;    
-    const relationData = this.dataMapping(dto, this.fieldList);
+    const relationData = this.dataMapping(dto);
     const homeworld = homeworldId;                                                                           
-    const newPerson = this.peopleRepository.create({
+    const record = this.peopleRepository.create({
       ...peopleDto,
       homeworld,
       ...relationData,
     } as DeepPartial<PeopleEntity>);
 
     try {
-      return await this.peopleRepository.save(newPerson);
+      return await this.peopleRepository.save(record);
     } catch (error) {
-      this.logger.error('An error occurred while saved person to DB', error);
+      this.logger.error('An error occurred while saved record to DB', error);
+      throw new InternalServerErrorException('An error occurred while saved record to DB')
     }
   } 
 
   async addImages(id: string, images: Express.Multer.File[]) {
-    const person = await this.findById(id, ['homeworld', 'vehicles', 'starships', 'images'])
+    const person = await this.findById(id)
     if (!person){
       throw new NotFoundException('Person not found')
     }
@@ -73,15 +74,17 @@ export class PeopleService extends BasicService<PeopleEntity> {
       if (listOfImagesNames.length !== 0) {
         this.fileService.deleteFiles(listOfImagesNames);
       }
+      throw new InternalServerErrorException('An error occurred while saved images')
     }
   }
 
   async update(id: string, dto: UpdatePeopleDto) {
+    const record = await this.findById(id);
     const validDto = Object.fromEntries(
       Object.entries(dto).filter(([key, val]) => val !== undefined),
     );
     const { filmsIds, starshipsIds, vehiclesIds, speciesIds, ...simpleData} = validDto
-    const relationData = this.dataMapping(validDto, this.fieldList);
+    const relationData = this.dataMapping(validDto);
     const updateData = await this.peopleRepository.preload({
       id: Number(id),
       ...simpleData,
@@ -93,20 +96,14 @@ export class PeopleService extends BasicService<PeopleEntity> {
         await this.peopleRepository.save(updateData);
       } catch (error) {
         this.logger.error('An error occurred while saved updated data ', error);
+        throw new InternalServerErrorException('An error occurred while saved record to DB')
       }
     }
     return updateData;
   }
 
-  // {        
-  //       homeworld: true,
-  //       vehicles: true,
-  //       starships: true,
-  //       images: true,
-  //     }
-
   async deleteImg(id: string, imgId: string) {
-    const person = await this.findById(id, ['homeworld', 'vehicles', 'starships', 'images']);
+    const person = await this.findById(id);
     const image = await this.imagesRepository.findOne({
       where: { id: Number(imgId) },
       relations: { people: true },
@@ -125,6 +122,7 @@ export class PeopleService extends BasicService<PeopleEntity> {
       return result;
     } catch (error) {
       this.logger.error('An error occurred while deleting image');
+      throw new InternalServerErrorException('An error occurred while deleting image')
     }
   }
 }

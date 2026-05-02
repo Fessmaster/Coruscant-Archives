@@ -1,7 +1,9 @@
 # compiled output
 server/dist
 server/node_modules
+server/storage
 sever/build
+
 
 # Logs
 logs
