@@ -103,21 +103,22 @@ export class PeopleService extends BasicService<PeopleEntity> {
   }
 
   async deleteImg(id: string, imgId: string) {
-    const person = await this.findById(id);
+    const record = await this.findById(id);
     const image = await this.imagesRepository.findOne({
       where: { id: Number(imgId) },
       relations: { people: true },
     });
 
-    if (!person || !image) {
+    if (!record || !image) {
       throw new NotFoundException();
     }
-
-    if (person.id !== image.people.id) {
+    const isBelong = image.people.some(rec=> rec.id===record.id)       
+    
+    if (!isBelong) {
       throw new NotFoundException('Image not belong this person');
     }
     try {
-      const result = this.imagesRepository.delete(image.id);
+      const result = this.imagesRepository.remove(image);
       this.fileService.deleteFile(image.url);
       return result;
     } catch (error) {

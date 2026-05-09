@@ -92,21 +92,22 @@ export class FilmsService extends BasicService<FilmsEntity> {
     }
   
     async deleteImg(id: string, imgId: string) {
-      const film = await this.findById(id);
-      const image = await this.imagesRepository.findOne({
-        where: { id: Number(imgId) },
-        relations: { people: true },
-      });
-  
-      if (!film || !image) {
-        throw new NotFoundException();
-      }
-  
-      if (film.id !== image.films.id) {
-        throw new NotFoundException('Image not belong this film');
-      }
+    const record = await this.findById(id);
+    const image = await this.imagesRepository.findOne({
+      where: { id: Number(imgId) },
+      relations: { films: true },
+    });
+
+    if (!record || !image) {
+      throw new NotFoundException();
+    }
+    const isBelong = image.films.some(rec=> rec.id===record.id)       
+    
+    if (isBelong) {
+      throw new NotFoundException('Image not belong this film');
+    }
       try {
-        const result = this.imagesRepository.delete(image.id);
+        const result = this.imagesRepository.remove(image);
         this.fileService.deleteFile(image.url);
         return result;
       } catch (error) {

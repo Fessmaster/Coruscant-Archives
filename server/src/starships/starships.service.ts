@@ -109,18 +109,19 @@ export class StarshipService extends BasicService<StarshipsEntity> {
     const record = await this.findById(id);
     const image = await this.imagesRepository.findOne({
       where: { id: Number(imgId) },
-      relations: { people: true },
+      relations: { starships: true },
     });
 
     if (!record || !image) {
       throw new NotFoundException();
     }
-
-    if (record.id !== image.people.id) {
+    const isBelong = image.starships.some(rec=> rec.id===record.id)       
+    
+    if (isBelong) {
       throw new NotFoundException('Image not belong this starship');
     }
     try {
-      const result = this.imagesRepository.delete(image.id);
+      const result = this.imagesRepository.remove(image);
       this.fileService.deleteFile(image.url);
       return result;
     } catch (error) {

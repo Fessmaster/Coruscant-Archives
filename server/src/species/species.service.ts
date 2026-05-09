@@ -109,21 +109,22 @@ export class SpeciesService extends BasicService<SpeciesEntity> {
   }
 
   async deleteImg(id: string, imgId: string) {
-    const species = await this.findById(id);
+    const record = await this.findById(id);
     const image = await this.imagesRepository.findOne({
       where: { id: Number(imgId) },
-      relations: { people: true },
+      relations: { species: true },
     });
 
-    if (!species || !image) {
+    if (!record || !image) {
       throw new NotFoundException();
     }
-
-    if (species.id !== image.people.id) {
+    const isBelong = image.species.some(rec=> rec.id===record.id)       
+    
+    if (isBelong) {
       throw new NotFoundException('Image not belong this species');
     }
     try {
-      const result = this.imagesRepository.delete(image.id);
+      const result = this.imagesRepository.remove(image);
       this.fileService.deleteFile(image.url);
       return result;
     } catch (error) {

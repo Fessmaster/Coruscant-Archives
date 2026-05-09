@@ -81,7 +81,7 @@ export class CreatePeopleDto extends BasicDto {
   @IsPositive()
   @Min(1)
   @IsOptional()
-  homeworldId: number;
+  homeworldId?: number;
 
   @ApiProperty({ type: [Number], example: [1,2]})
   @IsArray({ message: 'Field filmsIds must be an array' })
@@ -89,7 +89,7 @@ export class CreatePeopleDto extends BasicDto {
   @IsPositive({each: true})  
   @Min(1, { each: true })
   @IsOptional()
-  filmsIds: number[];
+  filmsIds?: number[];
 
   @ApiProperty({ type: [Number], example: [1,2] })
   @IsArray({ message: 'Field speciesIds must be an array' })
@@ -97,7 +97,7 @@ export class CreatePeopleDto extends BasicDto {
   @IsPositive({each: true})  
   @Min(1, { each: true })
   @IsOptional()
-  speciesIds: number[];
+  speciesIds?: number[];
 
   @ApiProperty({ type: [Number], example: [1,2] })
   @IsArray({ message: 'Field vehiclesIds must be an array' })
@@ -105,7 +105,7 @@ export class CreatePeopleDto extends BasicDto {
   @IsPositive({each: true})  
   @Min(1, { each: true })
   @IsOptional()
-  vehiclesIds: number[];
+  vehiclesIds?: number[];
 
   @ApiProperty({ type: [Number], example: [1,2] })
   @IsArray({ message: 'Field starshipsIds must be an array' })
@@ -113,5 +113,5 @@ export class CreatePeopleDto extends BasicDto {
   @IsPositive({each: true})  
   @Min(1, { each: true })
   @IsOptional()
-  starshipsIds: number[];
+  starshipsIds?: number[];
 }

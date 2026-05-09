@@ -13,20 +13,20 @@ export class ImagesEntity extends BasicEntity {
   url: string;
 
   @ManyToMany(() => PeopleEntity, (people) => people.images)
-  people: PeopleEntity;
+  people: PeopleEntity[];
 
   @ManyToMany(() => FilmsEntity, (films) => films.images)
-  films: FilmsEntity;
+  films: FilmsEntity[];
 
   @ManyToMany(() => PlanetsEntity, (planets) => planets.images)
-  planets: PlanetsEntity;
+  planets: PlanetsEntity[];
 
   @ManyToMany(() => SpeciesEntity, (species) => species.images)
-  species: SpeciesEntity;
+  species: SpeciesEntity[];
 
   @ManyToMany(() => StarshipsEntity, (starships) => starships.images)
-  starships: StarshipsEntity;
+  starships: StarshipsEntity[];
 
   @ManyToMany(() => VehiclesEntity, (vehicles) => vehicles.images)
-  vehicles: VehiclesEntity;
+  vehicles: VehiclesEntity[];
 }

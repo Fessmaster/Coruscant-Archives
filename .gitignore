@@ -1,8 +1,17 @@
+**/node_modules/
+
 # compiled output
 server/dist
 server/node_modules
 server/storage
 sever/build
+
+client/.next/
+client/out/
+
+.env*.local
+client/.env*
+server/.env*
 
 
 # Logs

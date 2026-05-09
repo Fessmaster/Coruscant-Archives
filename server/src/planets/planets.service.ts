@@ -107,21 +107,22 @@ export class PlanetsService extends BasicService<PlanetsEntity> {
   }
 
   async deleteImg(id: string, imgId: string) {
-    const planet = await this.findById(id);
+    const record = await this.findById(id);
     const image = await this.imagesRepository.findOne({
       where: { id: Number(imgId) },
-      relations: { people: true },
+      relations: { planets: true },
     });
 
-    if (!planet || !image) {
+    if (!record || !image) {
       throw new NotFoundException();
     }
-
-    if (planet.id !== image.people.id) {
+    const isBelong = image.planets.some(rec=> rec.id===record.id)       
+    
+    if (isBelong) {
       throw new NotFoundException('Image not belong this planet');
     }
     try {
-      const result = this.imagesRepository.delete(image.id);
+      const result = this.imagesRepository.remove(image);
       this.fileService.deleteFile(image.url);
       return result;
     } catch (error) {

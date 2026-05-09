@@ -12,6 +12,7 @@ export abstract class BasicService<T extends IBasicEntity> {
   ) {}
 
   private readonly LIMIT = 20;
+  private readonly imageUrl = 'https://pub-9d68176ca7fb4da099c6ec57db92aae9.r2.dev/';
 
   dataMapping(obj) {
     const mappedData = {};
@@ -39,7 +40,8 @@ export abstract class BasicService<T extends IBasicEntity> {
       throw new NotFoundException(`Record width id: ${id} not exist`)
     }
     const images = entity?.images?.map((img) => {
-      const imgUrl = join(process.cwd(), 'public', 'storage', img.url);
+      // const imgUrl = join(this.imageUrl, img.url);
+      const imgUrl = `${this.imageUrl}${img.url}`;
       img.url = imgUrl;
       return img;
     });    
