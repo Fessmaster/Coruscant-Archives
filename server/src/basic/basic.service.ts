@@ -1,7 +1,6 @@
 import { Logger, NotFoundException } from '@nestjs/common';
-import { join } from 'path';
 import { IBasicEntity } from 'src/basic/interface/basic-entity.interface';
-import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { IMetadata } from './interface/metadata.interface';
 
 export abstract class BasicService<T extends IBasicEntity> {
@@ -14,7 +13,7 @@ export abstract class BasicService<T extends IBasicEntity> {
   private readonly LIMIT = 20;
   private readonly imageUrl = 'https://pub-9d68176ca7fb4da099c6ec57db92aae9.r2.dev/';
 
-  dataMapping(obj) {
+  dataMapping(obj) {    
     const mappedData = {};
     for (const field of this.metadata.fieldList) {
       const entityField = field.replace(/Ids$/, '');
@@ -26,7 +25,7 @@ export abstract class BasicService<T extends IBasicEntity> {
           mappedData[entityField] = [];
         }
       }
-    }
+    }   
     return mappedData;
   }
 

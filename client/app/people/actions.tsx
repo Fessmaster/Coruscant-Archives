@@ -1,7 +1,7 @@
 'use server'
 import { revalidatePath } from "next/cache";
 
-export async function deletePeople(id: string, formData: FormData) {
+export async function deletePeople(id: string) {
   const result = await fetch(`http://localhost:3030/people/${id}`, {
     method: "DELETE",
   });

@@ -5,6 +5,7 @@ import { SubmitButton } from "../../../components/submitButton";
 
 export default function AddPersonPage() {
   const [state, formAction] = useActionState(createPerson, null);
+ 
 
   return (
     <main>

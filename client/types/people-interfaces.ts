@@ -19,13 +19,13 @@ export interface IPeople {
 
   readonly gender: string;
 
-  readonly homeworldId?: number;
+  readonly homeworld?: number;
 
-  readonly filmsIds?: number[];
+  readonly films?: number[];
 
-  readonly speciesIds?: number[];
+  readonly species?: number[];
 
-  readonly vehiclesIds?: number[];
+  readonly vehicles?: number[];
 
-  readonly starshipsIds?: number[];
+  readonly starships?: number[];
 }

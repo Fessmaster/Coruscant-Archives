@@ -67,8 +67,8 @@ export class PeopleController {
     return this.peopleService.findById(id);
   }
 
-  // @ApiBearerAuth()
-  // @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Create new record for this entity',
   })

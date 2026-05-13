@@ -1,4 +1,4 @@
-import { getOnePerson } from "./getData";
+import { getPersonById } from "@/lib/lib";
 
 export default async function PeoplePage({
   params,
@@ -7,7 +7,7 @@ export default async function PeoplePage({
 }) {
   const { id } = await params;
 
-  const res = await getOnePerson(id);
+  const res = await getPersonById(id);
 
   if(res.statusCode!==200){
     throw new Error(`Person with id:${id} not found`)

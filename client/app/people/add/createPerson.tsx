@@ -1,5 +1,6 @@
 "use server";
 
+import { auth } from "@/app/auth";
 import { CreatePersonSchema } from "../../../schema/create.Person.Schema";
 
 export async function createPerson(prevState: unknown, formData: FormData) {
@@ -8,6 +9,8 @@ export async function createPerson(prevState: unknown, formData: FormData) {
   const rawData = Object.fromEntries(formData.entries());
 
   const validateData = CreatePersonSchema.safeParse(rawData);
+
+  const session = await auth();
 
   if (!validateData.success){
     return {
@@ -25,6 +28,8 @@ export async function createPerson(prevState: unknown, formData: FormData) {
       body: JSON.stringify(dataObj),
       headers: {
         "Content-Type": "application/json",
+        'Authorization': `Bearer ${session?.user.accessToken}`
+
       },
     });
 
