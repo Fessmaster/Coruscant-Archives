@@ -124,8 +124,8 @@ export class PeopleController {
     return this.peopleService.update(id, peopleDto);
   }
 
-  // @ApiBearerAuth()
-  // @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @ApiOperation({
     summary: 'Deleting person record',

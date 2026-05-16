@@ -3,6 +3,8 @@
 import { UpdatePersonSchema } from "@/schema/update.Person.Scheme";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { apiRequest } from "./api-request";
+import { signOut } from "@/app/auth";
 
 export async function updatePeople(
   id: string,
@@ -17,12 +19,19 @@ export async function updatePeople(
     return { error: validateData.error.flatten().fieldErrors };
   }
 
-  const response = await fetch(`http://localhost:3030/people/${String(id)}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+  console.log('------FormData-------');
+  console.log(validateData);
+
+  const response = await apiRequest(`/people/${String(id)}`, {
+    method: 'PATCH',
     body: JSON.stringify(validateData.data),
     next: {tags: ['people-list', `people-${id}`]}
-  });
+  })
+
+  if(response.status === 401){
+    signOut({redirectTo: '/profile'})
+  }
+
 
   if (response.ok) {
     revalidateTag('people-list', 'max')

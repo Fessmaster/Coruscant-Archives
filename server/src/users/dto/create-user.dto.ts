@@ -29,6 +29,11 @@ export class CreateUserDTO {
   @IsEmail()
   email: string;
 
+  @ApiProperty({ description: "'user' or 'admin'", example: 'user', default: 'user'})
+  @IsString()
+  @Length(2, 30)
+  role: string;
+
   @ApiProperty({ description: 'User first name', example: 'John'})
   @IsString()
   @Length(2, 30)

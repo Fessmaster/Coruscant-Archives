@@ -2,6 +2,8 @@
 
 import { auth } from "@/app/auth";
 import { CreatePersonSchema } from "../../../schema/create.Person.Schema";
+import { signOut } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 export async function createPerson(prevState: unknown, formData: FormData) {
   await new Promise((res) => setTimeout(res, 2000)); //FIXME Delete promise
@@ -12,12 +14,12 @@ export async function createPerson(prevState: unknown, formData: FormData) {
 
   const session = await auth();
 
-  if (!validateData.success){
+  if (!validateData.success) {
     return {
       success: false,
-      message: 'Validation error',
-      error: validateData.error.flatten().fieldErrors
-    }
+      message: "Validation error",
+      error: validateData.error.flatten().fieldErrors,
+    };
   }
 
   try {
@@ -28,14 +30,21 @@ export async function createPerson(prevState: unknown, formData: FormData) {
       body: JSON.stringify(dataObj),
       headers: {
         "Content-Type": "application/json",
-        'Authorization': `Bearer ${session?.user.accessToken}`
-
+        Authorization: `Bearer ${session?.user.accessToken}`,
       },
     });
 
+    if (response.status === 401) {
+      return {
+        success: false,
+        message: 'Session expired',
+        needReauth: true
+      }
+    }
+
     if (!response.ok) {
       throw new Error("DB error");
-    }
+    }    
 
     return { message: "Data saved in DB", success: true };
   } catch (error) {

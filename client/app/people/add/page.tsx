@@ -1,11 +1,40 @@
 "use client";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { createPerson } from "./createPerson";
 import { SubmitButton } from "../../../components/submitButton";
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { ro } from "zod/locales";
 
 export default function AddPersonPage() {
-  const [state, formAction] = useActionState(createPerson, null);
- 
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [state, formAction] = useActionState(
+    async (prevState: unknown, formData: FormData) => {
+      const result = await createPerson(prevState, formData);
+
+      if (result?.needReauth) {
+        await signOut({ redirect: false });
+        router.push("/login");
+        return result;
+      }
+
+      return result;
+    },
+    null,
+  );
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/profile");
+    }
+  }, [status, router]);
+
+  if (status==='loading'||status==="unauthenticated"){
+    return(
+      <div>Завантаження...</div>
+    )
+  }
 
   return (
     <main>

@@ -17,8 +17,7 @@ export class AuthController {
     type: AuthorizationDto
   })
   @Post('login')
-  async login (@Request() req) {
-    console.log('--------------------- ', req.body );//FIXME
+  async login (@Request() req) {    
     return this.authService.login(req.user);
   }
 

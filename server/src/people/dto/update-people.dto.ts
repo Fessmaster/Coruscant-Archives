@@ -27,7 +27,7 @@ export class UpdatePeopleDto extends PartialType(CreatePeopleDto) {
   gender: string;
 
   @ApiPropertyOptional({ example: 1 })
-  homeworldId: number;
+  homeworldId: number;  
 
   @ApiPropertyOptional({ example: [1, 2] })
   filmsIds: number[];
