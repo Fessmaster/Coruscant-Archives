@@ -2,8 +2,6 @@
 
 import { auth } from "@/app/auth";
 import { CreatePersonSchema } from "../../../schema/create.Person.Schema";
-import { signOut } from "next-auth/react";
-import { redirect } from "next/navigation";
 
 export async function createPerson(prevState: unknown, formData: FormData) {
   await new Promise((res) => setTimeout(res, 2000)); //FIXME Delete promise

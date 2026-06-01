@@ -1,4 +1,4 @@
-import { getPersonById } from "@/lib/lib";
+import { getPersonById } from "@/lib/get-by-id";
 
 export default async function PeoplePage({
   params,

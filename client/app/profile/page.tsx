@@ -14,6 +14,8 @@ export default async function ProfilePage(){
     )
   }
 
+  console.log(session);
+
   return (
     <div>
       <p> Hello, {session.user.name}</p>

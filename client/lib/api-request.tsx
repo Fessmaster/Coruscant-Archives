@@ -1,6 +1,8 @@
 import { auth, signOut } from "@/app/auth";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3030';
 
 export async function apiRequest(endpoint: string, option: RequestInit = {}) {
+  const url = `${BASE_URL}${endpoint}`
   const session = await auth();
   const token = session?.user.accessToken;
 
@@ -10,7 +12,7 @@ export async function apiRequest(endpoint: string, option: RequestInit = {}) {
     ...option.headers,
   };
 
-  const response = await fetch(`http://localhost:3030${endpoint}`, {
+  const response = await fetch(url, {
     ...option,
     headers,
   });

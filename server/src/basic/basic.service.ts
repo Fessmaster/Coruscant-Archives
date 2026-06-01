@@ -69,6 +69,7 @@ export abstract class BasicService<T extends IBasicEntity> {
       previousPage: false,
     };
     const arrayOfEntities = await this.basicRepository.find({
+      relations:  this.metadata.relations as any,
       take: this.LIMIT + 1,
       skip: skip,
     });

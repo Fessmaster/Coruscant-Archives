@@ -4,7 +4,6 @@ import { createPerson } from "./createPerson";
 import { SubmitButton } from "../../../components/submitButton";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { ro } from "zod/locales";
 
 export default function AddPersonPage() {
   const { data: session, status } = useSession();

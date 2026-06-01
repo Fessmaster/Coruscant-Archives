@@ -36,8 +36,10 @@ const authConfig: NextAuthConfig = {
       }
       return token;
     },
-    async session({ session, token }: { session: Session; token: JWT }) {
+    async session({ session, token, }: { session: Session; token: JWT, user?:User }) {
       if (session.user) {
+        session.user.name = token.name;
+        session.user.id = token.id as string;
         session.user.accessToken = token.accessToken;
       }
       return session;

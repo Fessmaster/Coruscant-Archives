@@ -8,7 +8,7 @@ export const CreatePersonSchema = z.object({
   about: z
     .string("About must be a string")
     .min(2, "About too short")
-    .max(50, "About too long"),
+    .max(1000, "About too long"),
   height: z.preprocess(
     // transform empty field to undefined
     val => val==='' ? undefined : val,

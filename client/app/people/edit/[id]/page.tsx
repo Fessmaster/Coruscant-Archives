@@ -1,5 +1,5 @@
 import { EditPeopleForm } from "@/components/editPersonForm";
-import { getPersonById } from "@/lib/lib";
+import { getPersonById } from "@/lib/get-by-id";
 
 export default async function EditPage({
   params,
