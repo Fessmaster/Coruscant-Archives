@@ -48,7 +48,10 @@ export class PeopleController {
   @Get()
   @ApiQuery({ name: 'skip' })
   getPersonList(@Query('skip') skip: number) {
-    return this.peopleService.getArrayOfEntities(skip);
+    return this.peopleService.getArrayOfEntities(skip, {
+      fieldList:['id','name', 'gender', 'mass', 'height'],
+      relations:['images']
+    });
   }
 
   @ApiOperation({

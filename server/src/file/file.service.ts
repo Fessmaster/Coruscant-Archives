@@ -48,51 +48,51 @@ export class FileService implements OnModuleInit {
     }
   }
 
-  async saveFile(img: Express.Multer.File) {
-    const fileName = `${uuidv4()}${extname(img.originalname)}`;
-    try {
-      await this.s3Client.send(
-        new PutObjectCommand({
-          Bucket: this.bucket,
-          Key: fileName,
-          Body: img.buffer,
-          ContentType: img.mimetype
-        })
-      )
-      return fileName
-    } catch (error) {
-      this.logger.error('An error occurred while saving img', error.message)
-      throw error
-    }    
-  }
-
   // async saveFile(img: Express.Multer.File) {
   //   const fileName = `${uuidv4()}${extname(img.originalname)}`;
-  //   await this.storage.put(fileName, img.buffer);
-
-  //   return fileName;
+  //   try {
+  //     await this.s3Client.send(
+  //       new PutObjectCommand({
+  //         Bucket: this.bucket,
+  //         Key: fileName,
+  //         Body: img.buffer,
+  //         ContentType: img.mimetype
+  //       })
+  //     )
+  //     return fileName
+  //   } catch (error) {
+  //     this.logger.error('An error occurred while saving img', error.message)
+  //     throw error
+  //   }    
   // }
 
-    async deleteFile(fileName: string) {
-    try {
-      await this.s3Client.send(
-        new DeleteObjectCommand({
-          Bucket: this.bucket,
-          Key: fileName
-        })
-      );
-    } catch (error) {
-      this.logger.error(`Failed to delete file ${fileName}`, error.stack);
-    }
+  async saveFile(img: Express.Multer.File) {
+    const fileName = `${uuidv4()}${extname(img.originalname)}`;
+    await this.storage.put(fileName, img.buffer);
+
+    return fileName;
   }
 
-  // async deleteFile(fileName: string) {
+  //   async deleteFile(fileName: string) {
   //   try {
-  //     await this.storage.delete(fileName);
+  //     await this.s3Client.send(
+  //       new DeleteObjectCommand({
+  //         Bucket: this.bucket,
+  //         Key: fileName
+  //       })
+  //     );
   //   } catch (error) {
   //     this.logger.error(`Failed to delete file ${fileName}`, error.stack);
   //   }
   // }
+
+  async deleteFile(fileName: string) {
+    try {
+      await this.storage.delete(fileName);
+    } catch (error) {
+      this.logger.error(`Failed to delete file ${fileName}`, error.stack);
+    }
+  }
 
   async deleteFiles(imgList: string[]) {
     await Promise.all(imgList.map((img) => this.storage.delete(img)));

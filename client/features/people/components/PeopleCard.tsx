@@ -2,18 +2,18 @@ import { CardBox } from "@/components/ui/CardBox";
 
 interface PersonCardProps {
   person: {
-    id: string;
+    id: number;
     name: string;
-    height: string;
-    mass: string;
+    height: number;
+    mass: number;
     gender: string;
-    imageUrl?: string;
+    image?: string;
   };
 }
 
 export function PersonCardProps({ person }: PersonCardProps){
   return (
-    <CardBox imageUrl={person.imageUrl}>
+    <CardBox imageUrl={person.image}>
 
       <div className="space-y-1">
         <span className="text-xs font-semibold text-yellow-500 uppercase tracking-widest block">

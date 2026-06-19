@@ -1,6 +1,6 @@
 import { Logger, NotFoundException } from '@nestjs/common';
 import { IBasicEntity } from 'src/basic/interface/basic-entity.interface';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOneOptions, FindOptionsRelations, FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
 import { IMetadata } from './interface/metadata.interface';
 
 export abstract class BasicService<T extends IBasicEntity> {
@@ -63,25 +63,29 @@ export abstract class BasicService<T extends IBasicEntity> {
     }
   }
 
-  async getArrayOfEntities(skip: number) {
+  async getArrayOfEntities(skip: number, meta?: IMetadata<T>) {
     const navigation = {
       nextPage: false,
       previousPage: false,
     };
-    const arrayOfEntities = await this.basicRepository.find({
-      relations:  this.metadata.relations as any,
+    const selectOption = meta?.fieldList ? (meta.fieldList as unknown as FindOptionsSelect<T>) : undefined;
+    const relationOption = meta?.relations ? (meta.relations as unknown as FindOptionsRelations<T>) : undefined;
+    const [arrayOfEntities, countEntities] = await this.basicRepository.findAndCount({
+      select: selectOption,
+      relations: relationOption,
+      
       take: this.LIMIT + 1,
       skip: skip,
     });
 
     if (arrayOfEntities.length > this.LIMIT) {
       navigation.nextPage = true;
-      arrayOfEntities.pop;
+      arrayOfEntities.pop();
     }
     if (skip && skip > 0) {
       navigation.previousPage = true;
     }
 
-    return { navigation, result: arrayOfEntities };
+    return { navigation, countEntities, result: arrayOfEntities };
   }
 }
