@@ -2,7 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-   allowedDevOrigins: ['c430-80-64-81-160.ngrok-free.app']
+  allowedDevOrigins: ['fessmaster.pp.ua'],
 };
+
+module.exports = {
+  allowedDevOrigins: ['fessmaster.pp.ua'],
+}
 
 export default nextConfig;
