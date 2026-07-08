@@ -28,7 +28,9 @@ export default async function HomePage() {
         {/* Grid for cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {peopleData.arrayOfEntities.map((person) => (
+            <Link href={`/people/${person.id}`} key={person.id}>
             <PersonCardProps key={person.id} person={person} />
+            </Link>
           ))}
         </div>
       </section>

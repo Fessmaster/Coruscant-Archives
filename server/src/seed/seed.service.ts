@@ -92,7 +92,7 @@ export class SeedService implements OnApplicationBootstrap {
    * which will be used in the next stage of seeding.
    *
    * @param url - address to the corresponding data
-   * @param numberFields - array of numeric field names that need to be transformed
+   * @param numberFields - array of numeric field names that need to be transformed 
    * @param extraFields - array of field names to be used for creating the
    *                    relationship map and to be ignored when adding records to the database
    * @param repository - database repository instance
@@ -105,27 +105,25 @@ export class SeedService implements OnApplicationBootstrap {
     repository: Repository<T>,
     relationMap: Map<number, Record<string, number | number[]>> | null = null,
   ) {
-    while (url != null) {
-      const response = await getResponse(url);
-      url = response.next;
-      const rawData = getRawData(response.results);
-      if (relationMap != null) {
-        createRelationMap(relationMap, extraFields, rawData);
-      }
-      const normalizeData = validateNumber(rawData, numberFields);
-      const entitiesToSave: T[] = [];
-      for (const item of normalizeData) {
-        for (const field of extraFields) {
-          delete item[field];
-        }
-        entitiesToSave.push(repository.create(item as DeepPartial<T>));
-      }
-      try {
-        await repository.save(entitiesToSave);
-      } catch (error) {
-        this.logger.error(`Failed saving entity from API: ${error}`);
-      }
+    const response = await getResponse(url);
+    url = response.next;
+    const rawData = getRawData(response);
+    if (relationMap != null) {
+      createRelationMap(relationMap, extraFields, rawData);
     }
+    const normalizeData = validateNumber(rawData, numberFields);
+    const entitiesToSave: T[] = [];
+    for (const item of normalizeData) {
+      for (const field of extraFields) {
+        delete item[field];
+      }
+      entitiesToSave.push(repository.create(item as DeepPartial<T>));
+    }
+    try {
+      await repository.save(entitiesToSave);
+    } catch (error) {
+      this.logger.error(`Failed saving entity from API: ${error}`);
+    }    
   }
 
   /**
@@ -177,7 +175,7 @@ export class SeedService implements OnApplicationBootstrap {
     return [
       {
         name: 'people',
-        url: 'https://swapi.dev/api/people/',
+        url: 'https://swapi.info/api/people/',
         numberFields: ['height', 'mass'],
         extraFields: ['homeworld', 'films', 'species', 'vehicles', 'starships'],
         repository: this.peopleRepository,
@@ -188,7 +186,7 @@ export class SeedService implements OnApplicationBootstrap {
       },
       {
         name: 'films',
-        url: 'https://swapi.dev/api/films/',
+        url: 'https://swapi.info/api/films/',
         numberFields: [],
         extraFields: [
           'characters',
@@ -211,7 +209,7 @@ export class SeedService implements OnApplicationBootstrap {
       },
       {
         name: 'species',
-        url: 'https://swapi.dev/api/species/',
+        url: 'https://swapi.info/api/species/',
         numberFields: ['average_height', 'average_lifespan'],
         extraFields: ['people', 'films', 'homeworld'],
         repository: this.speciesRepository,
@@ -222,7 +220,7 @@ export class SeedService implements OnApplicationBootstrap {
       },
       {
         name: 'vehicles',
-        url: 'https://swapi.dev/api/vehicles/',
+        url: 'https://swapi.info/api/vehicles/',
         numberFields: [
           'length',
           'max_atmosphering_speed',
@@ -240,7 +238,7 @@ export class SeedService implements OnApplicationBootstrap {
       },
       {
         name: 'starships',
-        url: 'https://swapi.dev/api/starships/',
+        url: 'https://swapi.info/api/starships/',
         numberFields: [
           'length',
           'max_atmosphering_speed',
@@ -260,7 +258,7 @@ export class SeedService implements OnApplicationBootstrap {
       },
       {
         name: 'planets',
-        url: 'https://swapi.dev/api/planets/',
+        url: 'https://swapi.info/api/planets/',
         numberFields: [
           'rotation_period',
           'orbital_period',

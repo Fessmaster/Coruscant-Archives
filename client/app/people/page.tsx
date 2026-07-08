@@ -2,7 +2,8 @@ import { getPeopleArray } from "@/features/people/services";
 
 import { PersonCardProps } from "@/features/people/components/PeopleCard";
 import { CategoryNav } from "@/components/CategoryNav";
-import { PaginationArrows } from "@/components/PaginationArrows";
+import { PaginationArrows } from "@/components/ui/PaginationArrows";
+import Link from "next/link";
 
 interface PeoplePageProps {
   searchParams: Promise<{ page?: number }>;
@@ -32,9 +33,13 @@ export default async function PeoplePage({ searchParams }: PeoplePageProps) {
 
         {/* Grid for cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {peopleData.arrayOfEntities.map((person) => (
-            <PersonCardProps key={person.id} person={person} />
+          
+          {peopleData.arrayOfEntities.sort((a, b)=>a.id - b.id).map((person) => (
+            <Link href={`/people/${person.id}`} key={person.id}>
+              <PersonCardProps key={person.id} person={person} />
+              </Link>
           ))}
+          
         </div>
         
         <PaginationArrows 

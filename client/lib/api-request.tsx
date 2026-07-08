@@ -1,8 +1,8 @@
 import { auth, signOut } from "@/app/auth";
-import { ApiResponse } from "./api-client";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3030';
 
-export async function apiRequest<T>(endpoint: string, option: RequestInit = {}): Promise<ApiResponse<T>> {
+export async function apiRequest<T>(endpoint: string, option: RequestInit = {}): Promise<T> {
   const url = `${BASE_URL}${endpoint}`
   const session = await auth();
   const token = session?.user.accessToken;
@@ -22,5 +22,5 @@ export async function apiRequest<T>(endpoint: string, option: RequestInit = {}):
     await signOut({ redirectTo: "/profile" });
   }
 
-  return response.json() as Promise<ApiResponse<T>>
+  return response.json() as Promise<T>
 }
