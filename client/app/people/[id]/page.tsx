@@ -1,5 +1,6 @@
 import { CategoryNav } from "@/components/CategoryNav";
 import { AccordionGroup } from "@/components/ui/AccordionGroup";
+import { ConnectedNodesBlock } from "@/components/ui/ConnectedNodesBlock";
 import { EntityDescription } from "@/components/ui/EntityDescription";
 import { EntityGallery } from "@/components/ui/EntityGallery";
 import { EntitySpecsTable } from "@/components/ui/EntitySpecTable";
@@ -48,6 +49,10 @@ export default async function PeopleById({ params }: PeopleByIdProps) {
             Connected Database Nodes
           </h4>
           <AccordionGroup sections={data.personAccordions}/>
+        </div>
+
+        <div>
+          <ConnectedNodesBlock nodes={data.connectedNodes}/>
         </div>
       </section>
     </main>
