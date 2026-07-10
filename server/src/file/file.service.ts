@@ -2,9 +2,10 @@ import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Disk } from 'flydrive';
 import { dirname, extname, join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { mkdir, symlink } from 'fs/promises';
+import { mkdir, symlink, unlink } from 'fs/promises';
 import { DeleteObject$, DeleteObjectCommand, PutObjectAclCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
+import { lstat } from 'fs/promises';
 
 @Injectable()
 export class FileService implements OnModuleInit {
@@ -37,6 +38,18 @@ export class FileService implements OnModuleInit {
     await mkdir(dirname(link), { recursive: true });
 
     try {
+    const stats = await lstat(link).catch(() => null);
+
+    if (stats) {
+      
+      if (stats.isSymbolicLink()) {
+        await unlink(link);
+      } else {
+        // Якщо це раптом реальна папка, краще попередити, щоб випадково не видалити файли
+        this.logger.error('↪ Path public/storage is a real directory, not a symlink!');
+        return;
+      }
+    }
       await symlink(target, link, 'dir');
       this.logger.log('↪ Symlink created');
     } catch (error) {
