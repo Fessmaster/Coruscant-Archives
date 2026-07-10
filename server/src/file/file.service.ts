@@ -2,14 +2,14 @@ import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Disk } from 'flydrive';
 import { dirname, extname, join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { mkdir, symlink, unlink } from 'fs/promises';
-import { DeleteObject$, DeleteObjectCommand, PutObjectAclCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { mkdir, symlink, unlink, lstat } from 'fs/promises';
+// import { DeleteObject$, DeleteObjectCommand, PutObjectAclCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
-import { lstat } from 'fs/promises';
+
 
 @Injectable()
 export class FileService implements OnModuleInit {
-  private readonly s3Client: S3Client;
+  // private readonly s3Client: S3Client;
   private readonly bucket: string;
   private readonly logger = new Logger(FileService.name);
   constructor(
@@ -18,14 +18,14 @@ export class FileService implements OnModuleInit {
   ) {
     this.bucket = configService.getOrThrow('R2_BUCKET_NAME');
 
-    this.s3Client = new S3Client({
-      region: 'auto',
-      endpoint: `https://${configService.getOrThrow('R2_ACCOUNT_ID')}.r2.cloudflarestorage.com`,
-      credentials: {
-        accessKeyId: this.configService.getOrThrow('R2_ACCESS_KEY_ID'),
-        secretAccessKey: this.configService.getOrThrow('R2_SECRET_ACCESS_KEY'),
-      },
-    });
+    // this.s3Client = new S3Client({
+    //   region: 'auto',
+    //   endpoint: `https://${configService.getOrThrow('R2_ACCOUNT_ID')}.r2.cloudflarestorage.com`,
+    //   credentials: {
+    //     accessKeyId: this.configService.getOrThrow('R2_ACCESS_KEY_ID'),
+    //     secretAccessKey: this.configService.getOrThrow('R2_SECRET_ACCESS_KEY'),
+    //   },
+    // });
   }
 
   async onModuleInit() {
@@ -45,7 +45,6 @@ export class FileService implements OnModuleInit {
       if (stats.isSymbolicLink()) {
         await unlink(link);
       } else {
-        // Якщо це раптом реальна папка, краще попередити, щоб випадково не видалити файли
         this.logger.error('↪ Path public/storage is a real directory, not a symlink!');
         return;
       }
