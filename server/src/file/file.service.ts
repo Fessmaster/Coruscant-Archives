@@ -16,7 +16,7 @@ export class FileService implements OnModuleInit {
     @Inject('STORAGE_PROVIDER') private readonly storage: Disk,
     private readonly configService: ConfigService,
   ) {
-    this.bucket = configService.getOrThrow('R2_BUCKET_NAME');
+    // this.bucket = configService.getOrThrow('R2_BUCKET_NAME');
 
     // this.s3Client = new S3Client({
     //   region: 'auto',
